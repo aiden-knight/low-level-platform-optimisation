@@ -141,9 +141,14 @@ Vec3 screenToWorld(int x, int y) {
 // update the physics: gravity, collision test, collision resolution
 void updatePhysics(const float deltaTime) {
     
+    // todo for the assessment - use a thread for each sub region
+    // for example, assuming we have two regions:
+    // from 'colliders' create two separate lists
+    // empty each list (from previous frame) and work out which collidable object is in which region, 
+    //  and add the pointer to that region's list.
+    // Then, run two threads with the code below (changing 'colliders' to be the region's list)
 
-
-    for (ColliderObject* box : colliders) {
+    for (ColliderObject* box : colliders) { 
         
         box->update(&colliders, deltaTime);
         
