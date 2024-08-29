@@ -148,7 +148,7 @@ void updatePhysics(const float deltaTime) {
     //  and add the pointer to that region's list.
     // Then, run two threads with the code below (changing 'colliders' to be the region's list)
 
-    for (ColliderObject* box : colliders) {
+    for (ColliderObject* box : colliders) { 
         
         box->update(&colliders, deltaTime);
         
