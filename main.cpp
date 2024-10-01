@@ -1,11 +1,12 @@
 #include <stdlib.h>
 #include <GL/freeglut.h>
-#include <list>
 #include <iostream>
 
 #include <cstdlib>
 #include <ctime>
 #include <chrono>
+
+#include <array>
 #include <vector>
 
 #include "globals.h"
@@ -19,8 +20,8 @@
 using namespace std::chrono;
 
 // this is the number of falling physical items. 
-#define NUMBER_OF_BOXES 50
-#define NUMBER_OF_SPHERES 50
+constexpr unsigned int boxCount = 50;
+constexpr unsigned int sphereCount = 50;
 
 // these is where the camera is, where it is looking and the bounds of the continaing box. You shouldn't need to alter these
 
@@ -36,11 +37,9 @@ using namespace std::chrono;
 
 
 
-std::vector<ColliderObject*> colliders;
+std::array<ColliderObject*, boxCount + sphereCount> colliders;
 
 void initScene(int boxCount, int sphereCount) {
-    colliders.reserve(boxCount + sphereCount);
-
     for (int i = 0; i < boxCount; ++i) {
         Box* box = new Box();
 
@@ -60,7 +59,7 @@ void initScene(int boxCount, int sphereCount) {
         box->colour.y = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
         box->colour.z = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
 
-        colliders.emplace_back(box);
+        colliders[i] = box;
     }
 
     for (int i = 0; i < sphereCount; ++i) {
@@ -82,7 +81,7 @@ void initScene(int boxCount, int sphereCount) {
         sphere->colour.y = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
         sphere->colour.z = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
 
-        colliders.emplace_back(sphere);
+        colliders[boxCount + i] = sphere;
     }
 }
 
@@ -154,7 +153,7 @@ void updatePhysics(const float deltaTime) {
 
     for (ColliderObject* box : colliders) { 
         
-        box->update(&colliders, deltaTime);
+        box->update(colliders, deltaTime);
         
     }
 }
@@ -282,7 +281,6 @@ void cleanup()
     for (ColliderObject* obj : colliders) {
         delete obj;
     }
-    colliders.clear();
 }
 
 // called when the keyboard is used
@@ -334,7 +332,7 @@ int main(int argc, char** argv) {
     gluPerspective(45.0, 800.0 / 600.0, 0.1, 100.0);
     glMatrixMode(GL_MODELVIEW);
 
-    initScene(NUMBER_OF_BOXES, NUMBER_OF_SPHERES);
+    initScene(boxCount, sphereCount);
     glutDisplayFunc(display);
     glutIdleFunc(idle);
 
