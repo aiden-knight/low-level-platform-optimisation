@@ -175,7 +175,9 @@
     <ClCompile Include="Box.cpp" />
     <ClCompile Include="ColliderObject.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MemoryManager.cpp" />
     <ClCompile Include="Sphere.cpp" />
+    <ClCompile Include="Tracker.cpp" />
     <ClCompile Include="Vec3.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -183,7 +185,9 @@
     <ClInclude Include="Callbacks.h" />
     <ClInclude Include="ColliderObject.h" />
     <ClInclude Include="globals.h" />
+    <ClInclude Include="MemoryManager.h" />
     <ClInclude Include="Sphere.h" />
+    <ClInclude Include="Tracker.h" />
     <ClInclude Include="Vec3.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

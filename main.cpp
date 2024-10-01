@@ -1,17 +1,19 @@
 #include <stdlib.h>
-#include <GL/glut.h>
+#include <GL/freeglut.h>
 #include <list>
 #include <iostream>
 
 #include <cstdlib>
 #include <ctime>
 #include <chrono>
+#include <vector>
 
 #include "globals.h"
 #include "Vec3.h"
 #include "ColliderObject.h"
 #include "Box.h"
 #include "Sphere.h"
+#include "MemoryManager.h"
 
 
 using namespace std::chrono;
@@ -34,9 +36,11 @@ using namespace std::chrono;
 
 
 
-std::list<ColliderObject*> colliders;
+std::vector<ColliderObject*> colliders;
 
 void initScene(int boxCount, int sphereCount) {
+    colliders.reserve(boxCount + sphereCount);
+
     for (int i = 0; i < boxCount; ++i) {
         Box* box = new Box();
 
@@ -56,7 +60,7 @@ void initScene(int boxCount, int sphereCount) {
         box->colour.y = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
         box->colour.z = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
 
-        colliders.push_back(box);
+        colliders.emplace_back(box);
     }
 
     for (int i = 0; i < sphereCount; ++i) {
@@ -78,7 +82,7 @@ void initScene(int boxCount, int sphereCount) {
         sphere->colour.y = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
         sphere->colour.z = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
 
-        colliders.push_back(sphere);
+        colliders.emplace_back(sphere);
     }
 }
 
@@ -273,6 +277,14 @@ void mouse(int button, int state, int x, int y) {
     }
 }
 
+void cleanup()
+{
+    for (ColliderObject* obj : colliders) {
+        delete obj;
+    }
+    colliders.clear();
+}
+
 // called when the keyboard is used
 void keyboard(unsigned char key, int x, int y) {
     const float impulseMagnitude = 20.0f; // Upward impulse magnitude
@@ -286,7 +298,20 @@ void keyboard(unsigned char key, int x, int y) {
 
         std::cout << "Memory used" << std::endl;
     }
+    else if (key == 'm')
+    {
+        MemoryManager::OutputAllocations();
+    }
+    else if (key == 'x')
+    {
+        cleanup();
+    }
+    else if (key == 'q')
+    {
+        glutLeaveMainLoop();
+    }
 }
+
 
 // the main function. 
 int main(int argc, char** argv) {
@@ -295,7 +320,8 @@ int main(int argc, char** argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(1920, 1080);
-    glutCreateWindow("Simple Physics Simulation");
+    int handle = glutCreateWindow("Simple Physics Simulation");
+    glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION);
 
     glutKeyboardFunc(keyboard);
     glutMouseFunc(mouse);
@@ -314,5 +340,8 @@ int main(int argc, char** argv) {
 
     // it will stick here until the program ends. 
     glutMainLoop();
+
+    cleanup();
+
     return 0;
 }
