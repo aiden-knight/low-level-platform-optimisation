@@ -174,7 +174,6 @@
   <ItemGroup>
     <ClCompile Include="Box.cpp" />
     <ClCompile Include="ColliderObject.cpp" />
-    <ClCompile Include="CustomAllocator.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MemoryManager.cpp" />
     <ClCompile Include="Sphere.cpp" />

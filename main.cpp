@@ -36,7 +36,7 @@ constexpr unsigned int sphereCount = 50;
 #define LOOKDIR_Y 0
 #define LOOKDIR_Z 0
 
-std::vector<ColliderObject, CustomAllocator<ColliderObject>> colliders{ boxCount + sphereCount };
+std::vector<ColliderObject*> colliders{ boxCount + sphereCount };
 
 void initScene(int boxCount, int sphereCount) {
     for (int i = 0; i < boxCount; ++i) {
