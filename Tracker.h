@@ -14,8 +14,12 @@ class Tracker
 public:
 	Tracker(TrackerIndex index)
 	{
-		allocatedMemory = 0;
 		this->index = index;
+#ifdef _DEBUG
+
+#else
+		allocatedMemory = 0;
+#endif // !_DEBUG
 	}
 
 	inline void Allocation(const size_t amount) 
@@ -29,6 +33,9 @@ public:
 	inline void Deallocation(const size_t amount) 
 	{ 
 		allocatedMemory -= amount;
+		if (index == DEFAULT) {
+			std::cout << "Default Dealloc: " << amount << std::endl;
+		}
 	}
 
 	inline size_t GetAllocated() const { return allocatedMemory; }

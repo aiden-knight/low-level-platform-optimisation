@@ -16,14 +16,14 @@ namespace MemoryManager
 
 	namespace
 	{
-		std::array<Tracker, ARRAY_SIZE> trackers = { Tracker(DEFAULT), Tracker(BOX), Tracker(SPHERE) };
+		std::array<Tracker, ARRAY_SIZE> trackers = { Tracker(DEFAULT), Tracker(BOX), Tracker(SPHERE)};
 	}
 
 	void OutputAllocations()
 	{
 		std::cout << "Default: " << trackers[DEFAULT].GetAllocated() << std::endl;
 		std::cout << "Box: " << trackers[BOX].GetAllocated() << std::endl;
-		std::cout << "Sphere: " << trackers[SPHERE].GetAllocated() << std::endl;
+		std::cout << "Sphere: " << trackers[SPHERE].GetAllocated() << '\n' << std::endl;
 	}
 }
 
@@ -31,11 +31,13 @@ using namespace MemoryManager;
 
 void* operator new(size_t size)
 {
-	return ::operator new(size, DEFAULT);
+	return ::operator new(size, DEFAULT);;
 }
 
 void operator delete(void* ptr)
 {
+	if (ptr == nullptr) return;
+
 	ptr = (char*)ptr - sizeof(Header);
 	
 	Header* header = (Header*)ptr;

@@ -8,13 +8,16 @@
 
 #include <array>
 #include <vector>
+#include <memory>
 
 #include "globals.h"
 #include "Vec3.h"
 #include "ColliderObject.h"
 #include "Box.h"
 #include "Sphere.h"
+
 #include "MemoryManager.h"
+#include "CustomAllocator.h"
 
 
 using namespace std::chrono;
@@ -33,11 +36,7 @@ constexpr unsigned int sphereCount = 50;
 #define LOOKDIR_Y 0
 #define LOOKDIR_Z 0
 
-
-
-
-
-std::array<ColliderObject*, boxCount + sphereCount> colliders;
+std::vector<ColliderObject, CustomAllocator<ColliderObject>> colliders{ boxCount + sphereCount };
 
 void initScene(int boxCount, int sphereCount) {
     for (int i = 0; i < boxCount; ++i) {
@@ -152,9 +151,9 @@ void updatePhysics(const float deltaTime) {
     // Then, run two threads with the code below (changing 'colliders' to be the region's list)
 
     for (ColliderObject* box : colliders) { 
-        
-        box->update(colliders, deltaTime);
-        
+        if (box == nullptr) continue;
+
+        box->update(colliders.data(), colliders.size(), deltaTime);
     }
 }
 
@@ -204,6 +203,7 @@ void drawScene() {
     drawQuad(backWallV1, backWallV2, backWallV3, backWallV4);
 
     for (ColliderObject* box : colliders) {
+        if (box == nullptr) continue;
         box->draw();
     }
 }
@@ -255,6 +255,8 @@ void mouse(int button, int state, int x, int y) {
         float minIntersectionDistance = std::numeric_limits<float>::max();
 
         for (ColliderObject* box : colliders) {
+            if (box == nullptr) continue;
+
             if (rayBoxIntersection(cameraPosition, rayDirection, box)) {
                 // Calculate the distance between the camera and the intersected box
                 Vec3 diff = box->position - cameraPosition;
@@ -278,8 +280,9 @@ void mouse(int button, int state, int x, int y) {
 
 void cleanup()
 {
-    for (ColliderObject* obj : colliders) {
-        delete obj;
+    for (auto it = colliders.begin(); it != colliders.end(); ++it) {
+        delete *it;
+        *it = nullptr;
     }
 }
 
@@ -287,26 +290,39 @@ void cleanup()
 void keyboard(unsigned char key, int x, int y) {
     const float impulseMagnitude = 20.0f; // Upward impulse magnitude
 
-    if (key == ' ') { // Spacebar key
+    static int* intPtr = nullptr;
+
+    switch (key)
+    {
+    case ' ': // make colliders jump
         for (ColliderObject* box : colliders) {
             box->velocity.y += impulseMagnitude;
         }
-    }
-    else if (key == '1') { // 1
-
+        break;
+    case '1': // not sure
         std::cout << "Memory used" << std::endl;
-    }
-    else if (key == 'm')
-    {
+        break;
+    case 'm': // display memory allocation info
         MemoryManager::OutputAllocations();
-    }
-    else if (key == 'x')
-    {
+        break;
+    case 'x': // deletes all collider objects
         cleanup();
-    }
-    else if (key == 'q')
-    {
+        break;
+    case 'q': // quits glut main loop (freeglut)
         glutLeaveMainLoop();
+        break;
+    case 't': // allocates memory with global new
+        if (!intPtr) {
+            intPtr = new int[10];
+        }
+        break;
+    case 'u': // deallocates memory with global delete
+        delete[] intPtr;
+        intPtr = nullptr;
+        break;
+    case 'v':
+        colliders[2] = nullptr;
+        break;
     }
 }
 
