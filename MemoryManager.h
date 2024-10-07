@@ -1,4 +1,5 @@
 #pragma once
+#ifdef _DEBUG
 #include "Tracker.h"
 
 namespace MemoryManager
@@ -11,3 +12,5 @@ void* operator new(size_t size);
 void operator delete(void* ptr);
 
 void* operator new(size_t size, TrackerIndex tracker);
+
+#endif

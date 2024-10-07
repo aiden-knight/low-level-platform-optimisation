@@ -1,4 +1,5 @@
 #pragma once
+#ifdef _DEBUG
 #include <iostream>
 
 enum TrackerIndex
@@ -15,11 +16,7 @@ public:
 	Tracker(TrackerIndex index)
 	{
 		this->index = index;
-#ifdef _DEBUG
-
-#else
 		allocatedMemory = 0;
-#endif // !_DEBUG
 	}
 
 	inline void Allocation(const size_t amount) 
@@ -43,3 +40,4 @@ private:
 	size_t allocatedMemory;
 	TrackerIndex index;
 };
+#endif

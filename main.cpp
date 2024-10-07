@@ -1,4 +1,3 @@
-#include <stdlib.h>
 #include <GL/freeglut.h>
 #include <iostream>
 
@@ -17,8 +16,7 @@
 #include "Sphere.h"
 
 #include "MemoryManager.h"
-#include "CustomAllocator.h"
-
+#include "Timer.h"
 
 using namespace std::chrono;
 
@@ -28,15 +26,16 @@ constexpr unsigned int sphereCount = 50;
 
 // these is where the camera is, where it is looking and the bounds of the continaing box. You shouldn't need to alter these
 
-#define LOOKAT_X 10
-#define LOOKAT_Y 10
-#define LOOKAT_Z 50
+constexpr int LOOKAT_X = 10;
+constexpr int LOOKAT_Y = 10;
+constexpr int LOOKAT_Z = 50;
 
-#define LOOKDIR_X 10
-#define LOOKDIR_Y 0
-#define LOOKDIR_Z 0
+constexpr int LOOKDIR_X = 10;
+constexpr int LOOKDIR_Y = 0;
+constexpr int LOOKDIR_Z = 0;
 
 std::vector<ColliderObject*> colliders{ boxCount + sphereCount };
+//std::vector<Box*> boxColliders{ boxCount };
 
 void initScene(int boxCount, int sphereCount) {
     for (int i = 0; i < boxCount; ++i) {
@@ -303,7 +302,9 @@ void keyboard(unsigned char key, int x, int y) {
         std::cout << "Memory used" << std::endl;
         break;
     case 'm': // display memory allocation info
+#ifdef _DEBUG
         MemoryManager::OutputAllocations();
+#endif
         break;
     case 'x': // deletes all collider objects
         cleanup();
@@ -322,6 +323,12 @@ void keyboard(unsigned char key, int x, int y) {
         break;
     case 'v':
         colliders[2] = nullptr;
+        break;
+    case 'r':
+
+        break;
+    case 'a':
+
         break;
     }
 }
@@ -348,7 +355,10 @@ int main(int argc, char** argv) {
     gluPerspective(45.0, 800.0 / 600.0, 0.1, 100.0);
     glMatrixMode(GL_MODELVIEW);
 
+    Timer<std::chrono::steady_clock, std::milli> timer{};
     initScene(boxCount, sphereCount);
+    std::cout << "Init took: " << timer.Elapsed() << "ms" << std::endl;
+
     glutDisplayFunc(display);
     glutIdleFunc(idle);
 
