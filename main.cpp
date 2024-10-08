@@ -20,7 +20,6 @@ constexpr unsigned int boxCount = 50;
 constexpr unsigned int sphereCount = 50;
 
 // these is where the camera is, where it is looking and the bounds of the continaing box. You shouldn't need to alter these
-
 constexpr int LOOKAT_X = 10;
 constexpr int LOOKAT_Y = 10;
 constexpr int LOOKAT_Z = 50;
@@ -32,8 +31,6 @@ constexpr int LOOKDIR_Z = 0;
 LinkedVector<ColliderObject*> sphereColliders{ sphereCount };
 LinkedVector<ColliderObject*> boxColliders { &sphereColliders, boxCount };
 LinkedVector<ColliderObject*>& colliders = boxColliders;
-
-//std::vector<Box*> boxColliders{ boxCount };
 
 template <class ColliderType>
 ColliderObject* initColliderObject()

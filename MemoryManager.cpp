@@ -6,6 +6,8 @@
 #include <string>
 #include "ColliderObject.h"
 
+#include <exception>
+
 namespace MemoryManager
 {
 	namespace
@@ -83,6 +85,12 @@ void operator delete(void* ptr)
 	
 	Header* header = (Header*)ptr;
 	Footer* footer = (Footer*)((char*)ptr + sizeof(Header) + header->allocationSize);
+
+	if (header->checkVal != headerCheckValue || footer->checkVal != footerCheckValue)
+	{
+		throw std::overflow_error("Check values incorrect");
+	}
+
 	if (header->trackerPtr) header->trackerPtr->Deallocation(header->allocationSize);
 
 	std::free(ptr);
