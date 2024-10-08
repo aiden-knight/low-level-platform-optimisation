@@ -233,11 +233,10 @@ void mouse(int button, int state, int x, int y) {
         rayDirection.normalise();
 
         // Perform a ray-box intersection test and remove the clicked box
-        bool clickedBoxOK = false;
         float minIntersectionDistance = std::numeric_limits<float>::max();
 
+        ColliderObject* clickedBox = nullptr;
         for (ColliderObject* box : colliders) {
-            if (box == nullptr) continue;
 
             if (rayBoxIntersection(cameraPosition, rayDirection, box)) {
                 // Calculate the distance between the camera and the intersected box
@@ -246,16 +245,23 @@ void mouse(int button, int state, int x, int y) {
 
                 // Update the clicked box index if this box is closer to the camera
                 if (distance < minIntersectionDistance) {
-                    clickedBoxOK = true;
                     minIntersectionDistance = distance;
+                    clickedBox = box;
                 }
             }
         }
 
-        // Remove the clicked box if any
-        if (clickedBoxOK != false) {
-            // TODO
-            //colliders.erase(colliders.begin() + clickedBoxIndex);
+        if (clickedBox != nullptr)
+        {
+            auto end = colliders.end();
+            auto it = std::find(colliders.begin(), end, clickedBox);
+            if (it != end)
+            {
+                std::vector<ColliderObject*>& owningVector = it.linkedVec->vector;
+                size_t offset = (it.getPtr() - owningVector.data());
+                delete clickedBox;
+                owningVector.erase(owningVector.begin() + offset);
+            }
         }
     }
 }

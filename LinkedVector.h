@@ -35,6 +35,8 @@ public:
 		reference operator*() const { return *ptr; }
 		pointer operator->() { return ptr; }
 
+		pointer getPtr() { return ptr; }
+
 		// operators to increment the iterator
 		Iterator& operator++() 
 		{ 
@@ -60,10 +62,11 @@ public:
 		friend bool operator== (const Iterator& left, const Iterator& right) { return left.ptr == right.ptr; }
 		friend bool operator!= (const Iterator& left, const Iterator& right) { return left.ptr != right.ptr; }
 
+		LinkedVector<T>* linkedVec; // current vector (in linked vector container)
+
 	private:
 		pointer ptr; 
 		pointer endPtr; // end pointer of current vector
-		LinkedVector<T>* linkedVec; // current vector (in linked vector container)
 	};
 
 private:
