@@ -36,52 +36,43 @@ constexpr int LOOKDIR_X = 10;
 constexpr int LOOKDIR_Y = 0;
 constexpr int LOOKDIR_Z = 0;
 
-LinkedVector<ColliderObject*> colliders{ boxCount + sphereCount };
+LinkedVector<ColliderObject*> sphereColliders{ sphereCount };
+LinkedVector<ColliderObject*> boxColliders { &sphereColliders, boxCount };
+LinkedVector<ColliderObject*>& colliders = boxColliders;
+
 //std::vector<Box*> boxColliders{ boxCount };
+
+template <class ColliderType>
+ColliderObject* initColliderObject()
+{
+    ColliderObject* obj = new ColliderType();
+
+    // Assign random x, y, and z positions within specified ranges
+    obj->position.x = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
+    obj->position.y = 10.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 1.0f));
+    obj->position.z = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
+
+    obj->size = { 1.0f, 1.0f, 1.0f };
+
+    // Assign random x-velocity between -1.0f and 1.0f
+    float randomXVelocity = -1.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 2.0f));
+    obj->velocity = { randomXVelocity, 0.0f, 0.0f };
+
+    // Assign a random color to the box
+    obj->colour.x = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+    obj->colour.y = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+    obj->colour.z = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+
+    return obj;
+}
 
 void initScene(int boxCount, int sphereCount) {
     for (int i = 0; i < boxCount; ++i) {
-        Box* box = new Box();
-
-        // Assign random x, y, and z positions within specified ranges
-        box->position.x = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
-        box->position.y = 10.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 1.0f));
-        box->position.z = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
-
-        box->size = {1.0f, 1.0f, 1.0f};
-
-        // Assign random x-velocity between -1.0f and 1.0f
-        float randomXVelocity = -1.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 2.0f));
-        box->velocity = {randomXVelocity, 0.0f, 0.0f};
-
-        // Assign a random color to the box
-        box->colour.x = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-        box->colour.y = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-        box->colour.z = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-
-        colliders[i] = box;
+        boxColliders[i] = initColliderObject<Box>();
     }
 
     for (int i = 0; i < sphereCount; ++i) {
-        Sphere* sphere = new Sphere;
-
-        // Assign random x, y, and z positions within specified ranges
-        sphere->position.x = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
-        sphere->position.y = 10.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 1.0f));
-        sphere->position.z = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
-
-        sphere->size = { 1.0f, 1.0f, 1.0f };
-
-        // Assign random x-velocity between -1.0f and 1.0f
-        float randomXVelocity = -1.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 2.0f));
-        sphere->velocity = { randomXVelocity, 0.0f, 0.0f };
-
-        // Assign a random color to the box
-        sphere->colour.x = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-        sphere->colour.y = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-        sphere->colour.z = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-
-        colliders[boxCount + i] = sphere;
+        sphereColliders[i] = initColliderObject<Sphere>();
     }
 }
 
@@ -154,7 +145,7 @@ void updatePhysics(const float deltaTime) {
     for (ColliderObject* box : colliders) { 
         if (box == nullptr) continue;
 
-        box->update(colliders.data(), colliders.size(), deltaTime);
+        box->update(colliders, deltaTime);
     }
 }
 
@@ -285,6 +276,7 @@ void cleanup()
         delete *it;
         *it = nullptr;
     }
+    colliders.clear();
 }
 
 // called when the keyboard is used
@@ -327,10 +319,30 @@ void keyboard(unsigned char key, int x, int y) {
         colliders[2] = nullptr;
         break;
     case 'r':
-
+    {
+        std::vector<ColliderObject*>& boxes = boxColliders.vector;
+        delete boxes.back();
+        boxes.pop_back();
+    }
         break;
     case 'a':
-
+    {
+        ColliderObject* box = initColliderObject<Box>();
+        boxColliders.vector.push_back(box);
+    }
+        break;
+    case 'R':
+    {
+        std::vector<ColliderObject*>& spheres = sphereColliders.vector;
+        delete spheres.back();
+        spheres.pop_back();
+    }
+    break;
+    case 'A':
+    {
+        ColliderObject* sphere = initColliderObject<Sphere>();
+        sphereColliders.vector.push_back(sphere);
+    }
         break;
     }
 }

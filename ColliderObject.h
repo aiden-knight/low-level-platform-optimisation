@@ -4,6 +4,7 @@
 #include <array>
 #include <GL/glut.h>
 #include "globals.h"
+#include "LinkedVector.h"
 
 class ColliderObject
 {
@@ -70,7 +71,7 @@ public:
 
     virtual void drawMesh() {};
 
-    void update(ColliderObject *const *const colliders, const size_t colliderSize, const float& deltaTime)
+    void update(LinkedVector<ColliderObject*>& colliders, const float& deltaTime)
     {
         const float floorY = 0.0f;
         // Update velocity due to gravity
@@ -97,7 +98,7 @@ public:
         }
 
         // Check for collisions with other colliders
-        for (ColliderObject *const * it = colliders; it != colliders + colliderSize; ++it) {
+        for (auto it = colliders.begin(); it != colliders.end(); ++it) {
             ColliderObject* other = *it;
             if (other == nullptr) continue;
 
