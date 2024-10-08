@@ -1,12 +1,5 @@
 #include <GL/freeglut.h>
-#include <iostream>
-
-#include <cstdlib>
-#include <ctime>
 #include <chrono>
-
-#include <array>
-#include <memory>
 
 #include "globals.h"
 #include "Vec3.h"
