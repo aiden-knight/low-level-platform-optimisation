@@ -9,7 +9,7 @@ public:
 #ifdef _DEBUG
 	void* operator new (size_t size)
 	{
-		return ::operator new(size, SPHERE);
+		return ::operator new(size, MemoryManager::Sphere);
 	}
 #endif
 

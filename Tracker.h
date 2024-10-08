@@ -2,42 +2,52 @@
 #ifdef _DEBUG
 #include <iostream>
 
-enum TrackerIndex
-{
-	DEFAULT,
-	BOX,
-	SPHERE,
-	ARRAY_SIZE
-};
+#define TRACKERS \
+TI(Default), \
+TI(Box), \
+TI(Sphere)
 
-class Tracker
+
+namespace MemoryManager
 {
-public:
-	Tracker(TrackerIndex index)
+#define TI(name) name
+	enum TrackerIndex
 	{
-		this->index = index;
-		allocatedMemory = 0;
-	}
+		TRACKERS,
+		NUM_TRACKERS
+	};
+#undef TI
 
-	inline void Allocation(const size_t amount) 
-	{ 
-		allocatedMemory += amount;
-		if (index == DEFAULT) {
-			std::cout << "Default Alloc: " << amount << std::endl;
+	class Tracker
+	{
+	public:
+		Tracker(TrackerIndex index)
+		{
+			this->index = index;
+			allocatedMemory = 0;
 		}
-	}
 
-	inline void Deallocation(const size_t amount) 
-	{ 
-		allocatedMemory -= amount;
-		if (index == DEFAULT) {
-			std::cout << "Default Dealloc: " << amount << std::endl;
+		inline void Allocation(const size_t amount)
+		{
+			allocatedMemory += amount;
+			if (index == TrackerIndex::Default) {
+				std::cout << "Default Alloc: " << amount << std::endl;
+			}
 		}
-	}
 
-	inline size_t GetAllocated() const { return allocatedMemory; }
-private:
-	size_t allocatedMemory;
-	TrackerIndex index;
-};
+		inline void Deallocation(const size_t amount)
+		{
+			allocatedMemory -= amount;
+			if (index == TrackerIndex::Default) {
+				std::cout << "Default Dealloc: " << amount << std::endl;
+			}
+		}
+
+		inline size_t GetAllocated() const { return allocatedMemory; }
+	private:
+		size_t allocatedMemory;
+		TrackerIndex index;
+	};
+}
+
 #endif

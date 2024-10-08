@@ -6,7 +6,6 @@
 #include <chrono>
 
 #include <array>
-#include <vector>
 #include <memory>
 
 #include "globals.h"
@@ -16,7 +15,10 @@
 #include "Sphere.h"
 
 #include "MemoryManager.h"
+#undef TRACKERS
+
 #include "Timer.h"
+#include "LinkedVector.h"
 
 using namespace std::chrono;
 
@@ -34,7 +36,7 @@ constexpr int LOOKDIR_X = 10;
 constexpr int LOOKDIR_Y = 0;
 constexpr int LOOKDIR_Z = 0;
 
-std::vector<ColliderObject*> colliders{ boxCount + sphereCount };
+LinkedVector<ColliderObject*> colliders{ boxCount + sphereCount };
 //std::vector<Box*> boxColliders{ boxCount };
 
 void initScene(int boxCount, int sphereCount) {

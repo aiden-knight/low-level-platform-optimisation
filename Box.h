@@ -8,7 +8,7 @@ public:
 #ifdef _DEBUG
 	void* operator new (size_t size)
 	{
-		return ::operator new(size, BOX);
+		return ::operator new(size, MemoryManager::Box);
 	}
 #endif
 

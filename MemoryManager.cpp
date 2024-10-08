@@ -3,30 +3,51 @@
 #include "MemoryManager.h"
 #include <iostream>
 #include <cstdlib>
-#include <array>
 #include <string>
 #include "ColliderObject.h"
 
 namespace MemoryManager
 {
+	namespace
+	{
+		/// <summary>
+		/// Heap allocated array for trackers
+		/// </summary>
+		Tracker* trackers;
+
+#define TI(name) #name
+		const char* TrackerNames[] = { TRACKERS };
+#undef TI
+	}
+
+	constexpr uint32_t headerCheckValue = 0x01ABCDEF;
+	constexpr uint32_t footerCheckValue = 0xFEDCBA10;
+
+	/// <summary>
+	/// Header to track allocation size and relevant memory tracker 
+	/// </summary>
 	struct Header
 	{
 		size_t allocationSize;
 		Tracker* trackerPtr;
+		uint32_t checkVal;
 
-		Header(size_t size, Tracker* ptr) { allocationSize = size; trackerPtr = ptr; }
+		Header(size_t size, Tracker* ptr) { allocationSize = size; trackerPtr = ptr; checkVal = headerCheckValue; }
 	};
 
-	namespace
+
+	struct Footer
 	{
-		Tracker* trackers;
-	}
+		uint32_t checkVal;
+
+		Footer() { checkVal = footerCheckValue; }
+	};
 
 	char InitTrackers()
 	{
-		trackers = (Tracker*)std::malloc(sizeof(Tracker) * ARRAY_SIZE);
+		trackers = (Tracker*)std::malloc(sizeof(Tracker) * NUM_TRACKERS);
 		int i = 0;
-		for (int i = 0; i < ARRAY_SIZE; i++)
+		for (int i = 0; i < NUM_TRACKERS; i++)
 		{
 			void* dst = trackers + i;
 			new (dst) Tracker((TrackerIndex)i);
@@ -38,9 +59,10 @@ namespace MemoryManager
 
 	void OutputAllocations()
 	{
-		std::cout << "Default: " << trackers[DEFAULT].GetAllocated() << std::endl;
-		std::cout << "Box: " << trackers[BOX].GetAllocated() << std::endl;
-		std::cout << "Sphere: " << trackers[SPHERE].GetAllocated() << '\n' << std::endl;
+		for (int i = 0; i < NUM_TRACKERS; i++)
+		{
+			std::cout << TrackerNames[i] << ": " << trackers[i].GetAllocated() << std::endl;
+		}
 	}
 }
 
@@ -50,7 +72,7 @@ void* operator new(size_t size)
 {
 	static char initialised = InitTrackers();
 
-	return ::operator new(size, DEFAULT);
+	return ::operator new(size, TrackerIndex::Default);
 }
 
 void operator delete(void* ptr)
@@ -60,6 +82,7 @@ void operator delete(void* ptr)
 	ptr = (char*)ptr - sizeof(Header);
 	
 	Header* header = (Header*)ptr;
+	Footer* footer = (Footer*)((char*)ptr + sizeof(Header) + header->allocationSize);
 	if (header->trackerPtr) header->trackerPtr->Deallocation(header->allocationSize);
 
 	std::free(ptr);
@@ -67,12 +90,18 @@ void operator delete(void* ptr)
 
 void* operator new(size_t size, TrackerIndex tracker)
 {
-	size_t allocSize = sizeof(Header) + size;
-
+	// allocate memory
+	size_t allocSize = sizeof(Header) + size + sizeof(Footer);
 	void* ptr = std::malloc(allocSize);
-	new (ptr) Header(size, trackers + tracker);
-	(trackers + tracker)->Allocation(size);
 
+	// placement new construct header
+	new (ptr) Header(size, trackers + tracker);
+	(trackers + tracker)->Allocation(size); // add memory to relevant tracker
+
+	// placement new constuct footer
+	new ((char*)ptr + sizeof(Header) + size) Footer();
+
+	// return pointer to requested memory
 	return (char*)ptr + sizeof(Header);
 }
 

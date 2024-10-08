@@ -11,6 +11,6 @@ namespace MemoryManager
 void* operator new(size_t size);
 void operator delete(void* ptr);
 
-void* operator new(size_t size, TrackerIndex tracker);
+void* operator new(size_t size, MemoryManager::TrackerIndex tracker);
 
 #endif

@@ -175,14 +175,13 @@
     <ClCompile Include="ColliderObject.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MemoryManager.cpp" />
-    <ClCompile Include="Vec3.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Box.h" />
     <ClInclude Include="Callbacks.h" />
     <ClInclude Include="ColliderObject.h" />
-    <ClInclude Include="CustomAllocator.h" />
     <ClInclude Include="globals.h" />
+    <ClInclude Include="LinkedVector.h" />
     <ClInclude Include="MemoryManager.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="Timer.h" />
