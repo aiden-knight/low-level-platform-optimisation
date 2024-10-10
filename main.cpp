@@ -1,5 +1,6 @@
 #include <GL/freeglut.h>
 #include <chrono>
+#include <iostream>
 
 #include "globals.h"
 #include "Vec3.h"
@@ -291,11 +292,15 @@ void keyboard(unsigned char key, int x, int y) {
     case '1': // not sure
         std::cout << "Memory used" << std::endl;
         break;
-    case 'm': // display memory allocation info
 #ifdef _DEBUG
+    case 'm': // display memory allocation info
         MemoryManager::OutputAllocations();
-#endif
         break;
+    case 'w':
+        std::cout << "Walking the heap:" << std::endl;
+        MemoryManager::WalkHeap();
+        break;
+#endif
     case 'x': // deletes all collider objects
         cleanup();
         break;
@@ -310,6 +315,18 @@ void keyboard(unsigned char key, int x, int y) {
     case 'u': // deallocates memory with global delete
         delete[] intPtr;
         intPtr = nullptr;
+        break;
+    case 'f':
+        if (intPtr != nullptr)
+        {
+            int toCopy[11];
+            std::memcpy(intPtr, toCopy, sizeof(toCopy));
+            std::cout << "Memory corrupted\n" << std::endl;
+        }
+        else
+        {
+            std::cout << "Press t first to allocate memory to be corrupted!\n" << std::endl;
+        }
         break;
     case 'v':
         colliders[2] = nullptr;

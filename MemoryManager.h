@@ -1,10 +1,11 @@
 #pragma once
 #ifdef _DEBUG
-#include "Tracker.h"
+#include "TrackerIndex.h"
 
 namespace MemoryManager
 {
 	void OutputAllocations();
+	void WalkHeap();
 }
 
 // global operators

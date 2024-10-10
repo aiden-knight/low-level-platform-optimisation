@@ -8,7 +8,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MemoryManager.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Debug Only</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -30,17 +30,20 @@
     <ClInclude Include="Vec3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MemoryManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Tracker.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LinkedVector.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryManager.h">
+      <Filter>Header Files\Debug Only</Filter>
+    </ClInclude>
+    <ClInclude Include="Tracker.h">
+      <Filter>Header Files\Debug Only</Filter>
+    </ClInclude>
+    <ClInclude Include="TrackerIndex.h">
+      <Filter>Header Files\Debug Only</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -49,6 +52,12 @@
     </Filter>
     <Filter Include="Source Files">
       <UniqueIdentifier>{20827600-dc95-4fa2-ba17-b567236af8eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Debug Only">
+      <UniqueIdentifier>{c9712fca-743d-4e7c-8723-78eee8afaa0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Debug Only">
+      <UniqueIdentifier>{82193bf2-6d15-45ed-98a7-3f3e141d1615}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
