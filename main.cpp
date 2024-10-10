@@ -289,15 +289,12 @@ void keyboard(unsigned char key, int x, int y) {
             box->velocity.y += impulseMagnitude;
         }
         break;
-    case '1': // not sure
-        std::cout << "Memory used" << std::endl;
-        break;
 #ifdef _DEBUG
     case 'm': // display memory allocation info
         MemoryManager::OutputAllocations();
         break;
     case 'w':
-        std::cout << "Walking the heap:" << std::endl;
+        std::cout << "\nWalking the heap:" << std::endl;
         MemoryManager::WalkHeap();
         break;
 #endif
@@ -310,38 +307,39 @@ void keyboard(unsigned char key, int x, int y) {
     case 't': // allocates memory with global new
         if (!intPtr) {
             intPtr = new int[10];
+            std::cout << "Created array of 10 ints on heap" << std::endl;
         }
         break;
     case 'u': // deallocates memory with global delete
         delete[] intPtr;
         intPtr = nullptr;
+        std::cout << "Called delete on ptr to 10 int array" << std::endl;
         break;
     case 'f':
         if (intPtr != nullptr)
         {
             int toCopy[11];
             std::memcpy(intPtr, toCopy, sizeof(toCopy));
-            std::cout << "Memory corrupted\n" << std::endl;
+            std::cout << "Memory corrupted" << std::endl;
         }
         else
         {
-            std::cout << "Press t first to allocate memory to be corrupted!\n" << std::endl;
+            std::cout << "Press t first to allocate memory to be corrupted!" << std::endl;
         }
-        break;
-    case 'v':
-        colliders[2] = nullptr;
         break;
     case 'r':
     {
         std::vector<ColliderObject*>& boxes = boxColliders.vector;
         delete boxes.back();
         boxes.pop_back();
+        std::cout << "Removed Box" << std::endl;
     }
         break;
     case 'a':
     {
         ColliderObject* box = initColliderObject<Box>();
         boxColliders.vector.push_back(box);
+        std::cout << "Added Box" << std::endl;
     }
         break;
     case 'R':
@@ -349,12 +347,14 @@ void keyboard(unsigned char key, int x, int y) {
         std::vector<ColliderObject*>& spheres = sphereColliders.vector;
         delete spheres.back();
         spheres.pop_back();
+        std::cout << "Removed Sphere" << std::endl;
     }
-    break;
+        break;
     case 'A':
     {
         ColliderObject* sphere = initColliderObject<Sphere>();
         sphereColliders.vector.push_back(sphere);
+        std::cout << "Added Sphere" << std::endl;
     }
         break;
     }

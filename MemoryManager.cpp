@@ -72,12 +72,11 @@ namespace MemoryManager
 
 	void OutputAllocations()
 	{
-		std::cout << "Memory Trackers:\n";
+		std::cout << "\nMemory Trackers:\n";
 		for (int i = 0; i < NUM_TRACKERS; i++)
 		{
 			std::cout << TrackerNames[i] << " - " << trackers[i].GetAllocated() << " Bytes\n";
 		}
-		std::cout << std::endl;
 	}
 
 	inline bool PrintHeaderInfo(Header* header)
@@ -127,7 +126,8 @@ namespace MemoryManager
 		// means we reached the end
 		if (header == nullptr)
 		{
-			std::cout << "Successfully finished walking heap!\n" << std::endl;
+			std::cout << "Walked full heap" << std::endl;
+			std::cout << "Found corrupt footer = " << foundCorruptFooter << std::endl;
 			return;
 		}
 
@@ -143,7 +143,8 @@ namespace MemoryManager
 			else
 			{
 				std::cout << "Header check value corrupt whilst backward traversing, header ptr:" << headerReverse << std::endl;
-				std::cout << "May have missed some values due to early exit!\n" << std::endl;
+				std::cout << "May have missed some values due to early exit!" << std::endl;
+				std::cout << "Found corrupt footer = " << foundCorruptFooter << std::endl;
 				return;
 			}
 
@@ -154,7 +155,8 @@ namespace MemoryManager
 		// means we reached the end
 		if (headerReverse == header)
 		{
-			std::cout << "Successfully finished walking heap!\n" << std::endl;
+			std::cout << "Walked full heap" << std::endl;
+			std::cout << "Found corrupt footer = " << foundCorruptFooter << std::endl;
 			return;
 		}
 	}
