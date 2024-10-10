@@ -3,10 +3,8 @@
 #include "MemoryManager.h"
 #include <iostream>
 #include <cstdlib>
-#include <string>
-#include "ColliderObject.h"
-
 #include <exception>
+#include "ColliderObject.h"
 
 namespace MemoryManager
 {
@@ -55,16 +53,17 @@ namespace MemoryManager
 			new (dst) Tracker((TrackerIndex)i);
 		}
 
-		std::cout << "Initialised Trackers" << std::endl;
 		return 0;
 	}
 
 	void OutputAllocations()
 	{
+		std::cout << "Memory Trackers:\n";
 		for (int i = 0; i < NUM_TRACKERS; i++)
 		{
-			std::cout << TrackerNames[i] << ": " << trackers[i].GetAllocated() << std::endl;
+			std::cout << TrackerNames[i] << " - " << trackers[i].GetAllocated() << " Bytes\n";
 		}
+		std::cout << std::endl;
 	}
 }
 

@@ -367,7 +367,7 @@ int main(int argc, char** argv) {
 
     Timer<std::chrono::steady_clock, std::milli> timer{};
     initScene(boxCount, sphereCount);
-    std::cout << "Init took: " << timer.Elapsed() << "ms" << std::endl;
+    std::cout << "Init took: " << timer.Elapsed() << "ms\n" << std::endl;
 
     glutDisplayFunc(display);
     glutIdleFunc(idle);

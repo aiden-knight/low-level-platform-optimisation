@@ -30,17 +30,11 @@ namespace MemoryManager
 		inline void Allocation(const size_t amount)
 		{
 			allocatedMemory += amount;
-			if (index == TrackerIndex::Default) {
-				std::cout << "Default Alloc: " << amount << std::endl;
-			}
 		}
 
 		inline void Deallocation(const size_t amount)
 		{
 			allocatedMemory -= amount;
-			if (index == TrackerIndex::Default) {
-				std::cout << "Default Dealloc: " << amount << std::endl;
-			}
 		}
 
 		inline size_t GetAllocated() const { return allocatedMemory; }
