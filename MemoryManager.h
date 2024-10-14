@@ -1,17 +1,14 @@
 #pragma once
 #ifdef _DEBUG
-#include "TrackerIndex.h"
+enum TrackerIndex : unsigned int;
 
 namespace MemoryManager
 {
 	void OutputAllocations();
 	void WalkHeap();
+	void* UpdateTrackerDeallocation(void* ptr);
+	const size_t GetAllocSize(const size_t requested);
+	void* UpdateTrackerAllocation(void* ptr, const size_t size, const TrackerIndex tracker);
 }
-
-// global operators
-void* operator new(size_t size);
-void operator delete(void* ptr);
-
-void* operator new(size_t size, MemoryManager::TrackerIndex tracker);
 
 #endif

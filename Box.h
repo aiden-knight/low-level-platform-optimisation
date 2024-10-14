@@ -1,6 +1,6 @@
 #pragma once
 #include "ColliderObject.h"
-#include "MemoryManager.h"
+#include "MemoryOperators.h"
 
 class Box : public ColliderObject
 {

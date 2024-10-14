@@ -11,6 +11,7 @@
 #include "MemoryManager.h"
 #undef TRACKERS
 
+
 #include "Timer.h"
 #include "LinkedVector.h"
 
@@ -320,6 +321,18 @@ void keyboard(unsigned char key, int x, int y) {
         {
             int toCopy[11];
             std::memcpy(intPtr, toCopy, sizeof(toCopy));
+            std::cout << "Memory corrupted" << std::endl;
+        }
+        else
+        {
+            std::cout << "Press t first to allocate memory to be corrupted!" << std::endl;
+        }
+        break;
+    case 'h':
+        if (intPtr != nullptr)
+        {
+            int toCopy[11];
+            std::memcpy(intPtr-5, toCopy, sizeof(toCopy));
             std::cout << "Memory corrupted" << std::endl;
         }
         else

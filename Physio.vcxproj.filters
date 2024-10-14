@@ -10,6 +10,15 @@
     <ClCompile Include="MemoryManager.cpp">
       <Filter>Source Files\Debug Only</Filter>
     </ClCompile>
+    <ClCompile Include="MemoryOperators.h">
+      <Filter>Header Files\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryPool.cpp">
+      <Filter>Source Files\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryOperators.cpp">
+      <Filter>Source Files\Memory</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Callbacks.h">
@@ -45,6 +54,9 @@
     <ClInclude Include="TrackerIndex.h">
       <Filter>Header Files\Debug Only</Filter>
     </ClInclude>
+    <ClInclude Include="MemoryPool.h">
+      <Filter>Header Files\Memory</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
@@ -58,6 +70,12 @@
     </Filter>
     <Filter Include="Source Files\Debug Only">
       <UniqueIdentifier>{82193bf2-6d15-45ed-98a7-3f3e141d1615}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Memory">
+      <UniqueIdentifier>{46415cf7-cac9-4136-8170-8d69f13d858b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Memory">
+      <UniqueIdentifier>{ff445278-2e24-49e2-950f-aa8df6eca3f4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

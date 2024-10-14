@@ -9,7 +9,7 @@ TI(Sphere)
 namespace MemoryManager
 {
 #define TI(name) name
-	enum TrackerIndex
+	enum TrackerIndex : unsigned int
 	{
 		TRACKERS,
 		NUM_TRACKERS

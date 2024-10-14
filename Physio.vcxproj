@@ -173,9 +173,12 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="MemoryOperators.cpp" />
+    <ClCompile Include="MemoryOperators.h" />
     <ClCompile Include="ColliderObject.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MemoryManager.cpp" />
+    <ClCompile Include="MemoryPool.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Box.h" />
@@ -184,6 +187,7 @@
     <ClInclude Include="globals.h" />
     <ClInclude Include="LinkedVector.h" />
     <ClInclude Include="MemoryManager.h" />
+    <ClInclude Include="MemoryPool.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Tracker.h" />

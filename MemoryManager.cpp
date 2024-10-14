@@ -1,9 +1,7 @@
 #ifdef _DEBUG
-
-#include "MemoryManager.h"
 #include <iostream>
-#include <cstdlib>
 #include <exception>
+#include "MemoryManager.h"
 #include "Tracker.h"
 
 namespace MemoryManager
@@ -41,8 +39,7 @@ namespace MemoryManager
 		Footer() { checkVal = footerCheckValue; }
 	};
 
-	// VARIABLES
-	namespace
+	namespace // VARIABLES
 	{
 		/// <summary>
 		/// Heap allocated array for trackers
@@ -55,7 +52,7 @@ namespace MemoryManager
 
 		Header* startHeader = nullptr; // where to begin walking the heap from
 		Header* endHeader = nullptr; // to add new headers to the end
-	}
+	} // END VARIABLES
 
 	char InitTrackers()
 	{
@@ -160,78 +157,63 @@ namespace MemoryManager
 			return;
 		}
 	}
-}
-
-using namespace MemoryManager;
-
-/// <summary>
-/// Global new for default memory allocation
-/// </summary>
-void* operator new(size_t size)
-{
-	return ::operator new(size, TrackerIndex::Default); // calls global new with Default tracker index passed through
-}
-
-/// <summary>
-/// Global delete overloaded to ensure header and footer data is cleaned up
-/// </summary>
-/// <param name="ptr"></param>
-void operator delete(void* ptr)
-{
-	if (ptr == nullptr) return;
-
-	ptr = (char*)ptr - sizeof(Header);
-	
-	Header* header = (Header*)ptr;
-	Footer* footer = (Footer*)((char*)ptr + sizeof(Header) + header->allocationSize);
-
-	if (header->checkVal != headerCheckValue || footer->checkVal != footerCheckValue)
+	void* UpdateTrackerDeallocation(void* ptr)
 	{
-		throw std::overflow_error("Check values incorrect");
+		ptr = (char*)ptr - sizeof(Header);
+
+		Header* header = (Header*)ptr;
+		Footer* footer = (Footer*)((char*)ptr + sizeof(Header) + header->allocationSize);
+
+		if (header->checkVal != headerCheckValue || footer->checkVal != footerCheckValue)
+		{
+			throw std::overflow_error("Check values incorrect");
+		}
+
+		trackers[header->trackerIndex].Deallocation(header->allocationSize);
+
+		// update start and end header pointers if needed
+		if (header == startHeader) startHeader = header->next;
+		if (header == endHeader) endHeader = header->prev;
+
+		// update previous and next headers where applicable
+		if (header->next != nullptr) header->next->prev = header->prev;
+		if (header->prev != nullptr) header->prev->next = header->next;
+
+		return ptr;
+	}
+	const size_t GetAllocSize(const size_t requested)
+	{
+		return sizeof(Header) + requested + sizeof(Footer);
 	}
 
-	trackers[header->trackerIndex].Deallocation(header->allocationSize);
-
-	// update start and end header pointers if needed
-	if (header == startHeader) startHeader = header->next;
-	if (header == endHeader) endHeader = header->prev;
-
-	// update previous and next headers where applicable
-	if (header->next != nullptr) header->next->prev = header->prev;
-	if (header->prev != nullptr) header->prev->next = header->next;
-	
-	std::free(ptr);
-}
-
-void* operator new(size_t size, TrackerIndex tracker)
-{
-	static char initialised = InitTrackers(); // use of static variable initialisation to only init the trackers once
-
-	// allocate memory
-	size_t allocSize = sizeof(Header) + size + sizeof(Footer);
-	Header* ptr = (Header*)std::malloc(allocSize);
-
-	// placement new construct header
-	new (ptr) Header(size, tracker);
-	(trackers + tracker)->Allocation(size); // add memory to relevant tracker
-
-	// placement new constuct footer
-	new ((char*)(ptr + 1) + size) Footer();
-
-	// if startHeader hasn't been stored already, store created header there
-	if (startHeader == nullptr)
+	void* UpdateTrackerAllocation(void* ptr, const size_t size, const TrackerIndex tracker)
 	{
-		startHeader = ptr;
-	}
-	else // make old end point to current header as next and current point to old as previous
-	{
-		endHeader->next = ptr;
-		ptr->prev = endHeader;
-	}
-	endHeader = ptr; // update the new end header
+		static char initialised = InitTrackers(); // use of static variable initialisation to only init the trackers once
 
-	// return pointer to requested memory
-	return ptr + 1;
+		Header* headerPtr = (Header*)ptr;
+
+		// placement new construct header
+		new (headerPtr) Header(size, tracker);
+		(trackers + tracker)->Allocation(size); // add memory to relevant tracker
+
+		// placement new constuct footer
+		new ((char*)(headerPtr + 1) + size) Footer();
+
+		// if startHeader hasn't been stored already, store created header there
+		if (startHeader == nullptr)
+		{
+			startHeader = headerPtr;
+		}
+		else // make old end point to current header as next and current point to old as previous
+		{
+			endHeader->next = headerPtr;
+			headerPtr->prev = endHeader;
+		}
+		endHeader = headerPtr; // update the new end header
+
+		// return pointer to requested memory
+		return headerPtr + 1;
+	}
 }
 
 #endif
