@@ -1,6 +1,7 @@
 #include "MemoryOperators.h"
 #include "MemoryPoolManager.h"
 #include <cstdlib>
+#include <iostream>
 
 #ifdef _DEBUG
 #include "TrackerIndex.h"
@@ -34,7 +35,9 @@ void operator delete(void* ptr)
 	ptr = MemoryManager::UpdateTrackerDeallocation(ptr);
 #endif // _DEBUG
 
-	std::free(ptr);
+	// if memory was not in a memory pool free it manually
+	if (!MemoryPoolManager::FreeMemory(ptr))
+		std::free(ptr);
 }
 
 #ifdef _DEBUG
@@ -42,8 +45,12 @@ void* operator new(size_t size, MemoryManager::TrackerIndex tracker)
 {
 	const size_t allocSize = MemoryManager::GetAllocSize(size);
 	void* ptr = MemoryPoolManager::RequestMemory(allocSize);
-	if(ptr == nullptr)
+	if (ptr == nullptr)
+	{
+		static unsigned int count = 0;
+		std::cout << "Allocated using malloc not pool " << ++count << std::endl;
 		ptr = std::malloc(allocSize);
+	}
 	
 	return MemoryManager::UpdateTrackerAllocation(ptr, size, tracker);
 }

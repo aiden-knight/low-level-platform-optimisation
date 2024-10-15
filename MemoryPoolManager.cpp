@@ -1,17 +1,23 @@
 #include "MemoryPoolManager.h"
 #include "MemoryPool.h"
+#include <cstdlib>
+#include <new>
 
 namespace MemoryPoolManager
 {
 	namespace
 	{
-		MemoryPool<100>* poolPtr;
+		MemoryPool* poolPtr;
 	}
 
 	char InitMemoryPools()
 	{
-		 static MemoryPool<100> pool { 64 };
-		 poolPtr = &pool;
+		void* memory = std::malloc(sizeof(MemoryPool));
+		constexpr size_t chunkSize = 100;
+		constexpr size_t chunkCount = 109;
+		poolPtr = new (memory) MemoryPool(chunkSize, chunkCount);
+
+		return 0;
 	}
 
 	void* RequestMemory(size_t size)

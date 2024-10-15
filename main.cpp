@@ -319,8 +319,8 @@ void keyboard(unsigned char key, int x, int y) {
     case 'f':
         if (intPtr != nullptr)
         {
-            int toCopy[11];
-            std::memcpy(intPtr, toCopy, sizeof(toCopy));
+            void* toCopy = std::malloc(11 * 4);
+            std::memcpy(intPtr, toCopy, 11 * 4);
             std::cout << "Memory corrupted" << std::endl;
         }
         else
@@ -331,8 +331,8 @@ void keyboard(unsigned char key, int x, int y) {
     case 'h':
         if (intPtr != nullptr)
         {
-            int toCopy[11];
-            std::memcpy(intPtr-5, toCopy, sizeof(toCopy));
+            void* toCopy = std::malloc(11 * 4);
+            std::memcpy(intPtr-5, toCopy, 11 * 4);
             std::cout << "Memory corrupted" << std::endl;
         }
         else
@@ -351,7 +351,7 @@ void keyboard(unsigned char key, int x, int y) {
     case 'a':
     {
         ColliderObject* box = initColliderObject<Box>();
-        boxColliders.vector.push_back(box);
+        boxColliders.vector.emplace_back(box);
         std::cout << "Added Box" << std::endl;
     }
         break;
@@ -366,7 +366,7 @@ void keyboard(unsigned char key, int x, int y) {
     case 'A':
     {
         ColliderObject* sphere = initColliderObject<Sphere>();
-        sphereColliders.vector.push_back(sphere);
+        sphereColliders.vector.emplace_back(sphere);
         std::cout << "Added Sphere" << std::endl;
     }
         break;

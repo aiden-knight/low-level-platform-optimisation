@@ -157,6 +157,7 @@ namespace MemoryManager
 			return;
 		}
 	}
+
 	void* UpdateTrackerDeallocation(void* ptr)
 	{
 		ptr = (char*)ptr - sizeof(Header);
@@ -181,6 +182,7 @@ namespace MemoryManager
 
 		return ptr;
 	}
+
 	const size_t GetAllocSize(const size_t requested)
 	{
 		return sizeof(Header) + requested + sizeof(Footer);

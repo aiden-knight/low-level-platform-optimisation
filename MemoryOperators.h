@@ -1,3 +1,4 @@
+#pragma once
 // global operators
 void* operator new(size_t size);
 void operator delete(void* ptr);
