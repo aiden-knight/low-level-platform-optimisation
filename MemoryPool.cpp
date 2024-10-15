@@ -3,6 +3,7 @@
 #include <cstring>
 #include <iostream>
 #include <cmath>
+#include <bitset>
 
 namespace MemoryPoolManager
 {

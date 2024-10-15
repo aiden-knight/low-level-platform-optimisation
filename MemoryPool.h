@@ -21,9 +21,9 @@ namespace MemoryPoolManager
 		const size_t chunkNumber;
 		const size_t byteCount;
 
-		static constexpr char continueMask = 0b01000000;
-		static constexpr char occupiedMask = 0b10000000;
-		static constexpr char combinedMask = 0b11000000;
+		static constexpr unsigned char continueMask = 0b01000000;
+		static constexpr unsigned char occupiedMask = 0b10000000;
+		static constexpr unsigned char combinedMask = 0b11000000;
 
 		unsigned char* start;
 

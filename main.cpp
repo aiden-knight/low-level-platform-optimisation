@@ -374,7 +374,7 @@ void keyboard(unsigned char key, int x, int y) {
         std::cout << "Added Sphere" << std::endl;
     }
         break;
-    case 'P':
+    case 'p':
         MemoryPoolManager::OutputDebug();
         break;
     }
