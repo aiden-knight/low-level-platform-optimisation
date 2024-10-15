@@ -38,7 +38,7 @@ namespace MemoryPoolManager
 
 				for (unsigned int i = 0; i < 4; ++i)
 				{
-					if ((wholeByte & 0x10000000) && ++found == chunksNeeded)
+					if (!(wholeByte & 0x10000000) && ++found == chunksNeeded)
 					{
 
 					}
