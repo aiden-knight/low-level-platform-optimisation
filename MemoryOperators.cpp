@@ -44,7 +44,9 @@ void operator delete(void* ptr)
 void* operator new(size_t size, MemoryManager::TrackerIndex tracker)
 {
 	const size_t allocSize = MemoryManager::GetAllocSize(size);
-	void* ptr = MemoryPoolManager::RequestMemory(allocSize);
+	void* ptr = nullptr;
+	if (tracker != MemoryManager::TrackerIndex::Default)
+		ptr = MemoryPoolManager::RequestMemory(allocSize);
 	if (ptr == nullptr)
 	{
 		static unsigned int count = 0;

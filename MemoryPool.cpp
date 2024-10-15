@@ -35,12 +35,12 @@ namespace MemoryPoolManager
 		bool exit = false;
 		for (unsigned int found = 0, bytePos = 0; !exit; ++bytePos)
 		{
-			char wholeByte = *(start + bytePos);
+			unsigned char wholeByte = *(start + bytePos);
 
 			for (unsigned int i = 0; i < 4; ++i)
 			{
 				// if first bit is not set
-				if (!(wholeByte & 0x10000000))
+				if (!(wholeByte & occupiedMask))
 				{
 					// if found enough chunks
 					if (++found == chunksNeeded)
@@ -113,5 +113,40 @@ namespace MemoryPoolManager
 		std::cout << "Dealloacted " << count << " blocks, max size possible is: " << chunkSize * count << std::endl;
 
 		return true;
+	}
+	void MemoryPool::Output()
+	{
+		void* poolStart = start + byteCount;
+		std::cout << "First pool chunk start: " << poolStart << std::endl;
+		size_t bitsPos = 0;
+		for (unsigned int found = 0, bytePos = 0; ; ++bytePos)
+		{
+			unsigned char wholeByte = *(start + bytePos);
+
+			for (unsigned int i = 0; i < 4; ++i)
+			{
+				bool occupied = (wholeByte & occupiedMask);
+				bool continued = (wholeByte & continueMask);
+
+				if (occupied)
+					std::cout << "1";
+				else
+					std::cout << "0";
+
+				if(continued)
+					std::cout << "1";
+				else
+					std::cout << "0";
+				std::cout << "|";
+
+				// shift to check next bit 2 over
+				wholeByte <<= 2;
+				if (++bitsPos == chunkNumber)
+				{
+					std::cout << std::endl;
+					return;
+				}
+			}
+		}
 	}
 }

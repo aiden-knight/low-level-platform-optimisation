@@ -8,9 +8,11 @@
 #include "Box.h"
 #include "Sphere.h"
 
+#include "MemoryOperators.h"
 #include "MemoryManager.h"
 #undef TRACKERS
 
+#include "MemoryPoolManager.h"
 
 #include "Timer.h"
 #include "LinkedVector.h"
@@ -322,6 +324,7 @@ void keyboard(unsigned char key, int x, int y) {
             void* toCopy = std::malloc(11 * 4);
             std::memcpy(intPtr, toCopy, 11 * 4);
             std::cout << "Memory corrupted" << std::endl;
+            std::free(toCopy);
         }
         else
         {
@@ -334,6 +337,7 @@ void keyboard(unsigned char key, int x, int y) {
             void* toCopy = std::malloc(11 * 4);
             std::memcpy(intPtr-5, toCopy, 11 * 4);
             std::cout << "Memory corrupted" << std::endl;
+            std::free(toCopy);
         }
         else
         {
@@ -369,6 +373,9 @@ void keyboard(unsigned char key, int x, int y) {
         sphereColliders.vector.emplace_back(sphere);
         std::cout << "Added Sphere" << std::endl;
     }
+        break;
+    case 'P':
+        MemoryPoolManager::OutputDebug();
         break;
     }
 }

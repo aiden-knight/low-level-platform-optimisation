@@ -14,6 +14,8 @@ namespace MemoryPoolManager
 
 		bool Free(void* ptr);
 
+		void Output();
+
 	private:
 		const size_t chunkSize;
 		const size_t chunkNumber;

@@ -1,7 +1,7 @@
 #include "MemoryPoolManager.h"
 #include "MemoryPool.h"
 #include <cstdlib>
-#include <new>
+#include <iostream>
 
 namespace MemoryPoolManager
 {
@@ -30,5 +30,9 @@ namespace MemoryPoolManager
 	bool FreeMemory(void* ptr)
 	{
 		return poolPtr->Free(ptr);
+	}
+	void OutputDebug()
+	{
+		poolPtr->Output();
 	}
 }
