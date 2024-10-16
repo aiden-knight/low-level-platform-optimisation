@@ -10,5 +10,5 @@ namespace MemoryPoolManager
 	/// <returns>false if memory is not contained in any pools</returns>
 	bool FreeMemory(void* ptr);
 
-	void OutputDebug();
+	void PrintPoolDebugInfo();
 }

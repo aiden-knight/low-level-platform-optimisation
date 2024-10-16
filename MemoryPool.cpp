@@ -9,7 +9,7 @@ namespace MemoryPoolManager
 {
 	MemoryPool::MemoryPool(const size_t chunkSize, const size_t chunkNumber) :
 		chunkSize{chunkSize},
-		chunkNumber{chunkNumber},
+		chunkCount{chunkNumber},
 		byteCount{(size_t)std::ceil(chunkNumber / 4.0f)}
 	{
 		start = (unsigned char*)std::malloc(byteCount + (chunkSize * chunkNumber));
@@ -58,7 +58,7 @@ namespace MemoryPoolManager
 
 				// shift to check next bit 2 over
 				wholeByte <<= 2;
-				if (++bitsPos == chunkNumber) return nullptr; // if end of pool and not found enough space return nullptr
+				if (++bitsPos == chunkCount) return nullptr; // if end of pool and not found enough space return nullptr
 			}
 		}
 
@@ -90,7 +90,7 @@ namespace MemoryPoolManager
 		const unsigned int bitsPos = ((unsigned char*)ptr - poolStart) / chunkSize; // where the bits that need to be flipped begin
 
 		// if the pointer is not within pool return failed deallocation
-		if (bitsPos >= chunkNumber) return false;
+		if (bitsPos >= chunkCount) return false;
 
 		// reset the bits to false to indicate empty chunk
 		unsigned int bitOffset = (bitsPos % 4) * 2;
@@ -111,14 +111,18 @@ namespace MemoryPoolManager
 				bitOffset = 0;
 			}
 		}
-		std::cout << "Dealloacted " << count << " blocks, max size possible is: " << chunkSize * count << std::endl;
-
 		return true;
 	}
-	void MemoryPool::Output()
+
+	void MemoryPool::Print()
 	{
 		void* poolStart = start + byteCount;
-		std::cout << "First pool chunk start: " << poolStart << std::endl;
+		std::cout << "\nPrinting pool with chunk size: " << chunkSize << ", and chunk count of: " << chunkCount << std::endl;
+		std::cout << "Pointer to start of first chunk: " << poolStart << std::endl;
+		std::cout << "\nPool fill info - "
+			<< "first bit is whether chunk is occupied, "
+			<< "second is whether next chunk is used by same occupier as current chunk, "
+			<< "chunks are separated by pipe character:\n|";
 		size_t bitsPos = 0;
 		for (unsigned int found = 0, bytePos = 0; ; ++bytePos)
 		{
@@ -142,7 +146,7 @@ namespace MemoryPoolManager
 
 				// shift to check next bit 2 over
 				wholeByte <<= 2;
-				if (++bitsPos == chunkNumber)
+				if (++bitsPos == chunkCount)
 				{
 					std::cout << std::endl;
 					return;

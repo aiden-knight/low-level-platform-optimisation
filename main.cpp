@@ -10,7 +10,6 @@
 
 #include "MemoryOperators.h"
 #include "MemoryManager.h"
-#undef TRACKERS
 
 #include "MemoryPoolManager.h"
 
@@ -295,6 +294,7 @@ void keyboard(unsigned char key, int x, int y) {
 #ifdef _DEBUG
     case 'm': // display memory allocation info
         MemoryManager::OutputAllocations();
+        MemoryPoolManager::PrintPoolDebugInfo();
         break;
     case 'w':
         std::cout << "\nWalking the heap:" << std::endl;
@@ -373,9 +373,6 @@ void keyboard(unsigned char key, int x, int y) {
         sphereColliders.vector.emplace_back(sphere);
         std::cout << "Added Sphere" << std::endl;
     }
-        break;
-    case 'p':
-        MemoryPoolManager::OutputDebug();
         break;
     }
 }

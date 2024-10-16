@@ -175,7 +175,6 @@
   <ItemGroup>
     <ClCompile Include="Box.cpp" />
     <ClCompile Include="MemoryOperators.cpp" />
-    <ClCompile Include="MemoryOperators.h" />
     <ClCompile Include="ColliderObject.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MemoryManager.cpp" />
@@ -190,6 +189,7 @@
     <ClInclude Include="globals.h" />
     <ClInclude Include="LinkedVector.h" />
     <ClInclude Include="MemoryManager.h" />
+    <ClInclude Include="MemoryOperators.h" />
     <ClInclude Include="MemoryPool.h" />
     <ClInclude Include="MemoryPoolManager.h" />
     <ClInclude Include="Sphere.h" />

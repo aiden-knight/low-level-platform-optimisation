@@ -10,9 +10,6 @@
     <ClCompile Include="MemoryManager.cpp">
       <Filter>Source Files\Debug Only</Filter>
     </ClCompile>
-    <ClCompile Include="MemoryOperators.h">
-      <Filter>Header Files\Memory</Filter>
-    </ClCompile>
     <ClCompile Include="MemoryOperators.cpp">
       <Filter>Source Files\Memory</Filter>
     </ClCompile>
@@ -67,6 +64,9 @@
       <Filter>Header Files\Memory</Filter>
     </ClInclude>
     <ClInclude Include="MemoryPoolManager.h">
+      <Filter>Header Files\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryOperators.h">
       <Filter>Header Files\Memory</Filter>
     </ClInclude>
   </ItemGroup>

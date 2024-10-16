@@ -31,8 +31,8 @@ namespace MemoryPoolManager
 	{
 		return poolPtr->Free(ptr);
 	}
-	void OutputDebug()
+	void PrintPoolDebugInfo()
 	{
-		poolPtr->Output();
+		poolPtr->Print();
 	}
 }
