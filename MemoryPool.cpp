@@ -11,7 +11,7 @@ namespace MemoryPoolManager
 		chunkCount{chunkNumber},
 		byteCount{(size_t)std::ceil(chunkNumber / 4.0f)}
 	{
-		start = (unsigned char*)std::malloc(byteCount + (chunkSize * chunkNumber));
+		start = (Byte*)std::malloc(byteCount + (chunkSize * chunkNumber));
 		if (start != nullptr)
 			std::memset(start, 0, byteCount);
 	}
@@ -35,7 +35,7 @@ namespace MemoryPoolManager
 		bool exit = false;
 		for (unsigned int found = 0, bytePos = 0; !exit; ++bytePos)
 		{
-			unsigned char wholeByte = *(start + bytePos);
+			Byte wholeByte = *(start + bytePos);
 
 			for (unsigned int i = 0; i < 4; ++i)
 			{
@@ -63,7 +63,7 @@ namespace MemoryPoolManager
 
 		// for loop sets relevant bits as occupied
 		unsigned int bitOffset = (bitsPos % 4) * 2;
-		unsigned char* byte = (start + (bitsPos / 4)); // first byte to edit
+		Byte* byte = (start + (bitsPos / 4)); // first byte to edit
 		for (unsigned int count = chunksNeeded; count != 0; --count)
 		{
 			// if at end then apply end mask to signify stop point for freeing
@@ -85,15 +85,15 @@ namespace MemoryPoolManager
 
 	bool MemoryPool::Free(void* ptr)
 	{
-		const unsigned char* const poolStart = start + byteCount; // pointer to start of pool
-		const unsigned int bitsPos = ((unsigned char*)ptr - poolStart) / chunkSize; // where the bits that need to be flipped begin
+		const Byte* const poolStart = start + byteCount; // pointer to start of pool
+		const unsigned int bitsPos = ((Byte*)ptr - poolStart) / chunkSize; // where the bits that need to be flipped begin
 
 		// if the pointer is not within pool return failed deallocation
 		if (bitsPos >= chunkCount) return false;
 
 		// reset the bits to false to indicate empty chunk
 		unsigned int bitOffset = (bitsPos % 4) * 2;
-		unsigned char* byte = (start + (bitsPos / 4)); // first byte to edit
+		Byte* byte = (start + (bitsPos / 4)); // first byte to edit
 		bool continueLoop = true;
 		unsigned int count = 0;
 		while (continueLoop)
@@ -125,7 +125,7 @@ namespace MemoryPoolManager
 		size_t bitsPos = 0;
 		for (unsigned int found = 0, bytePos = 0; ; ++bytePos)
 		{
-			unsigned char wholeByte = *(start + bytePos);
+			Byte wholeByte = *(start + bytePos);
 
 			for (unsigned int i = 0; i < 4; ++i)
 			{

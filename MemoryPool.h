@@ -5,6 +5,8 @@ namespace MemoryPoolManager
 {
 	class MemoryPool
 	{
+		using Byte = unsigned char;
+
 	public:
 		MemoryPool(const size_t chunkSize, const size_t chunkCount);
 
@@ -21,10 +23,10 @@ namespace MemoryPoolManager
 		const size_t chunkCount;
 		const size_t byteCount;
 
-		static constexpr unsigned char continueMask = 0b01000000;
-		static constexpr unsigned char occupiedMask = 0b10000000;
-		static constexpr unsigned char combinedMask = 0b11000000;
+		static constexpr Byte continueMask = 0b01000000;
+		static constexpr Byte occupiedMask = 0b10000000;
+		static constexpr Byte combinedMask = 0b11000000;
 
-		unsigned char* start;
+		Byte* start;
 	};
 }

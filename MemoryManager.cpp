@@ -236,7 +236,6 @@ namespace MemoryManager
 			std::free(trackers);
 			trackers = nullptr;
 		}
-
 	}
 }
 
