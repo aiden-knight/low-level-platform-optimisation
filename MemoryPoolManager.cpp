@@ -1,7 +1,7 @@
 #include "MemoryPoolManager.h"
 #include "MemoryPool.h"
 #include <cstdlib>
-#include <iostream>
+#include <new> // placement new
 
 namespace MemoryPoolManager
 {
