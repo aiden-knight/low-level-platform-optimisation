@@ -11,4 +11,6 @@ namespace MemoryPoolManager
 	bool FreeMemory(void* ptr);
 
 	void PrintPoolDebugInfo();
+
+	void Cleanup();
 }

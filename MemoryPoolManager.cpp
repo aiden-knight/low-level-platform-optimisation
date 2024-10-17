@@ -7,7 +7,7 @@ namespace MemoryPoolManager
 {
 	namespace
 	{
-		MemoryPool* poolPtr;
+		MemoryPool* poolPtr = nullptr;
 	}
 
 	char InitMemoryPools()
@@ -31,8 +31,19 @@ namespace MemoryPoolManager
 	{
 		return poolPtr->Free(ptr);
 	}
+
 	void PrintPoolDebugInfo()
 	{
 		poolPtr->Print();
+	}
+
+	void Cleanup()
+	{
+		if (poolPtr != nullptr)
+		{
+			poolPtr->~MemoryPool();
+			std::free(poolPtr);
+			poolPtr = nullptr;
+		}
 	}
 }

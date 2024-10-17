@@ -44,7 +44,7 @@ namespace MemoryManager
 		/// <summary>
 		/// Heap allocated array for trackers
 		/// </summary>
-		Tracker* trackers;
+		Tracker* trackers = nullptr;
 
 #define TI(name) #name
 		const char* TrackerNames[] = { TRACKERS };
@@ -69,6 +69,8 @@ namespace MemoryManager
 
 	void OutputAllocations()
 	{
+		if (trackers == nullptr) return;
+
 		std::cout << "\nMemory Trackers:\n";
 		for (int i = 0; i < NUM_TRACKERS; i++)
 		{
@@ -90,6 +92,13 @@ namespace MemoryManager
 		return footerCorrupt;
 	}
 
+	inline void HeapWalkFinished(bool foundCorruptFooter, unsigned int blocksChecked, bool walkedFull = true)
+	{
+		std::cout << (walkedFull ? "Walked full heap" : "May have missed some values due to early exit!") << std::endl;
+		std::cout << "Found corrupt footer = " << foundCorruptFooter << std::endl;
+		std::cout << "Blocks checked = " << blocksChecked << std::endl;
+	}
+
 	void WalkHeap()
 	{
 		if (startHeader == nullptr)
@@ -101,10 +110,13 @@ namespace MemoryManager
 		Header* header = startHeader;
 		std::cout << std::boolalpha;
 		bool foundCorruptFooter = false;
+		unsigned int blocksChecked = 0;
 
 		// forward traverse
 		while (header != nullptr)
 		{
+			std::cout << "Block " << (++blocksChecked) << ": ";
+
 			if (header->checkVal == headerCheckValue)
 			{
 				if (PrintHeaderInfo(header)) foundCorruptFooter = true;
@@ -121,11 +133,10 @@ namespace MemoryManager
 		}
 
 		// means we reached the end
-		if (header == nullptr)
-		{
-			std::cout << "Walked full heap" << std::endl;
-			std::cout << "Found corrupt footer = " << foundCorruptFooter << std::endl;
-			return;
+		if (header == nullptr) 
+		{ 
+			HeapWalkFinished(foundCorruptFooter, blocksChecked);	
+			return; 
 		}
 
 		// traverse backwards until hits corrupt header
@@ -133,6 +144,7 @@ namespace MemoryManager
 		std::cout << "\nTraversing backwards" << std::endl;
 		while (headerReverse != header)
 		{
+			std::cout << "Block " << (++blocksChecked) << ": ";
 			if (headerReverse->checkVal == headerCheckValue)
 			{
 				if (PrintHeaderInfo(headerReverse)) foundCorruptFooter = true;
@@ -140,8 +152,7 @@ namespace MemoryManager
 			else
 			{
 				std::cout << "Header check value corrupt whilst backward traversing, header ptr:" << headerReverse << std::endl;
-				std::cout << "May have missed some values due to early exit!" << std::endl;
-				std::cout << "Found corrupt footer = " << foundCorruptFooter << std::endl;
+				HeapWalkFinished(foundCorruptFooter, blocksChecked, false);
 				return;
 			}
 
@@ -152,8 +163,7 @@ namespace MemoryManager
 		// means we reached the end
 		if (headerReverse == header)
 		{
-			std::cout << "Walked full heap" << std::endl;
-			std::cout << "Found corrupt footer = " << foundCorruptFooter << std::endl;
+			HeapWalkFinished(foundCorruptFooter, blocksChecked);
 			return;
 		}
 	}
@@ -215,6 +225,18 @@ namespace MemoryManager
 
 		// return pointer to requested memory
 		return headerPtr + 1;
+	}
+
+	void Cleanup()
+	{
+		if (trackers != nullptr)
+		{
+			OutputAllocations();
+
+			std::free(trackers);
+			trackers = nullptr;
+		}
+
 	}
 }
 

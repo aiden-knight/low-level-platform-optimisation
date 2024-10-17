@@ -31,9 +31,13 @@ constexpr int LOOKDIR_X = 10;
 constexpr int LOOKDIR_Y = 0;
 constexpr int LOOKDIR_Z = 0;
 
-LinkedVector<ColliderObject*> sphereColliders{ sphereCount };
-LinkedVector<ColliderObject*> boxColliders { &sphereColliders, boxCount };
-LinkedVector<ColliderObject*>& colliders = boxColliders;
+using ColliderObjs = LinkedVector<ColliderObject*>;
+
+ColliderObjs* sphereColliders = new ColliderObjs(sphereCount);
+ColliderObjs* boxColliders = new ColliderObjs(sphereColliders, boxCount);
+
+// Fine as box colliders only deleted at end of program
+ColliderObjs& colliders = *boxColliders;
 
 template <class ColliderType>
 ColliderObject* initColliderObject()
@@ -61,11 +65,11 @@ ColliderObject* initColliderObject()
 
 void initScene(int boxCount, int sphereCount) {
     for (int i = 0; i < boxCount; ++i) {
-        boxColliders[i] = initColliderObject<Box>();
+        (*boxColliders)[i] = initColliderObject<Box>();
     }
 
     for (int i = 0; i < sphereCount; ++i) {
-        sphereColliders[i] = initColliderObject<Sphere>();
+        (*sphereColliders)[i] = initColliderObject<Sphere>();
     }
 }
 
@@ -122,9 +126,6 @@ Vec3 screenToWorld(int x, int y) {
     return Vec3((float)posX, (float)posY, (float)posZ);
 }
 
-
-
-
 // update the physics: gravity, collision test, collision resolution
 void updatePhysics(const float deltaTime) {
     
@@ -134,7 +135,6 @@ void updatePhysics(const float deltaTime) {
     // empty each list (from previous frame) and work out which collidable object is in which region, 
     //  and add the pointer to that region's list.
     // Then, run two threads with the code below (changing 'colliders' to be the region's list)
-
     for (ColliderObject* box : colliders) { 
         if (box == nullptr) continue;
 
@@ -152,8 +152,6 @@ void drawQuad(const Vec3& v1, const Vec3& v2, const Vec3& v3, const Vec3& v4) {
     glVertex3f(v4.x, v4.y, v4.z);
     glEnd();
 }
-
-
 
 // draw the entire scene
 void drawScene() {
@@ -187,6 +185,7 @@ void drawScene() {
     Vec3 backWallV4(maxX, 0.0f, minZ);
     drawQuad(backWallV1, backWallV2, backWallV3, backWallV4);
 
+    ColliderObjs& colliders = *boxColliders;
     for (ColliderObject* box : colliders) {
         if (box == nullptr) continue;
         box->draw();
@@ -239,6 +238,7 @@ void mouse(int button, int state, int x, int y) {
         float minIntersectionDistance = std::numeric_limits<float>::max();
 
         ColliderObject* clickedBox = nullptr;
+        ColliderObjs& colliders = *boxColliders;
         for (ColliderObject* box : colliders) {
 
             if (rayBoxIntersection(cameraPosition, rayDirection, box)) {
@@ -271,11 +271,25 @@ void mouse(int button, int state, int x, int y) {
 
 void cleanup()
 {
-    for (auto it = colliders.begin(); it != colliders.end(); ++it) {
-        delete *it;
-        *it = nullptr;
+    if (sphereColliders != nullptr && boxColliders != nullptr)
+    {
+        ColliderObjs& colliders = *boxColliders;
+        for (auto it = colliders.begin(); it != colliders.end(); ++it) {
+            delete* it;
+            *it = nullptr;
+        }
+        colliders.clear();
+
+        delete sphereColliders;
+        sphereColliders = nullptr;
+        delete boxColliders;
+        boxColliders = nullptr;
     }
-    colliders.clear();
+
+#ifdef _DEBUG
+    MemoryManager::Cleanup();
+#endif
+    MemoryPoolManager::Cleanup();
 }
 
 // called when the keyboard is used
@@ -301,9 +315,6 @@ void keyboard(unsigned char key, int x, int y) {
         MemoryManager::WalkHeap();
         break;
 #endif
-    case 'x': // deletes all collider objects
-        cleanup();
-        break;
     case 'q': // quits glut main loop (freeglut)
         glutLeaveMainLoop();
         break;
@@ -346,7 +357,7 @@ void keyboard(unsigned char key, int x, int y) {
         break;
     case 'r':
     {
-        std::vector<ColliderObject*>& boxes = boxColliders.vector;
+        std::vector<ColliderObject*>& boxes = boxColliders->vector;
         delete boxes.back();
         boxes.pop_back();
         std::cout << "Removed Box" << std::endl;
@@ -355,13 +366,13 @@ void keyboard(unsigned char key, int x, int y) {
     case 'a':
     {
         ColliderObject* box = initColliderObject<Box>();
-        boxColliders.vector.emplace_back(box);
+        boxColliders->vector.emplace_back(box);
         std::cout << "Added Box" << std::endl;
     }
         break;
     case 'R':
     {
-        std::vector<ColliderObject*>& spheres = sphereColliders.vector;
+        std::vector<ColliderObject*>& spheres = sphereColliders->vector;
         delete spheres.back();
         spheres.pop_back();
         std::cout << "Removed Sphere" << std::endl;
@@ -370,13 +381,12 @@ void keyboard(unsigned char key, int x, int y) {
     case 'A':
     {
         ColliderObject* sphere = initColliderObject<Sphere>();
-        sphereColliders.vector.emplace_back(sphere);
+        sphereColliders->vector.emplace_back(sphere);
         std::cout << "Added Sphere" << std::endl;
     }
         break;
     }
 }
-
 
 // the main function. 
 int main(int argc, char** argv) {
