@@ -15,6 +15,7 @@
 
 #include "Timer.h"
 #include "LinkedVector.h"
+#include "PointerChecker.h"
 
 using namespace std::chrono;
 
@@ -31,18 +32,18 @@ constexpr int LOOKDIR_X = 10;
 constexpr int LOOKDIR_Y = 0;
 constexpr int LOOKDIR_Z = 0;
 
-using ColliderObjs = LinkedVector<ColliderObject*>;
+using ColliderObjs = LinkedVector<Ptr(ColliderObject)>;
 
-ColliderObjs* sphereColliders = new ColliderObjs(sphereCount);
-ColliderObjs* boxColliders = new ColliderObjs(sphereColliders, boxCount);
+Ptr(ColliderObjs) sphereColliders = new ColliderObjs(sphereCount);
+Ptr(ColliderObjs) boxColliders = new ColliderObjs(sphereColliders, boxCount);
 
 // Fine as box colliders only deleted at end of program
 ColliderObjs& colliders = *boxColliders;
 
 template <class ColliderType>
-ColliderObject* initColliderObject()
+Ptr(ColliderObject) initColliderObject()
 {
-    ColliderObject* obj = new ColliderType();
+    Ptr(ColliderObject) obj = new ColliderType();
 
     // Assign random x, y, and z positions within specified ranges
     obj->position.x = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
@@ -74,7 +75,7 @@ void initScene(int boxCount, int sphereCount) {
 }
 
 // a ray which is used to tap (by default, remove) a box - see the 'mouse' function for how this is used.
-bool rayBoxIntersection(const Vec3& rayOrigin, const Vec3& rayDirection, const ColliderObject* box) {
+bool rayBoxIntersection(const Vec3& rayOrigin, const Vec3& rayDirection, const Ptr(ColliderObject) box) {
     float tMin = (box->position.x - box->size.x / 2.0f - rayOrigin.x) / rayDirection.x;
     float tMax = (box->position.x + box->size.x / 2.0f - rayOrigin.x) / rayDirection.x;
 
@@ -135,7 +136,7 @@ void updatePhysics(const float deltaTime) {
     // empty each list (from previous frame) and work out which collidable object is in which region, 
     //  and add the pointer to that region's list.
     // Then, run two threads with the code below (changing 'colliders' to be the region's list)
-    for (ColliderObject* box : colliders) { 
+    for (Ptr(ColliderObject) box : colliders) {
         if (box == nullptr) continue;
 
         box->update(colliders, deltaTime);
@@ -186,7 +187,7 @@ void drawScene() {
     drawQuad(backWallV1, backWallV2, backWallV3, backWallV4);
 
     ColliderObjs& colliders = *boxColliders;
-    for (ColliderObject* box : colliders) {
+    for (Ptr(ColliderObject) box : colliders) {
         if (box == nullptr) continue;
         box->draw();
     }
@@ -237,9 +238,9 @@ void mouse(int button, int state, int x, int y) {
         // Perform a ray-box intersection test and remove the clicked box
         float minIntersectionDistance = std::numeric_limits<float>::max();
 
-        ColliderObject* clickedBox = nullptr;
+        Ptr(ColliderObject) clickedBox = nullptr;
         ColliderObjs& colliders = *boxColliders;
-        for (ColliderObject* box : colliders) {
+        for (Ptr(ColliderObject) box : colliders) {
 
             if (rayBoxIntersection(cameraPosition, rayDirection, box)) {
                 // Calculate the distance between the camera and the intersected box
@@ -260,7 +261,7 @@ void mouse(int button, int state, int x, int y) {
             auto it = std::find(colliders.begin(), end, clickedBox);
             if (it != end)
             {
-                std::vector<ColliderObject*>& owningVector = it.linkedVec->vector;
+                std::vector<Ptr(ColliderObject)>& owningVector = it.linkedVec->vector;
                 size_t offset = (it.getPtr() - owningVector.data());
                 delete clickedBox;
                 owningVector.erase(owningVector.begin() + offset);
@@ -296,12 +297,12 @@ void cleanup()
 void keyboard(unsigned char key, int x, int y) {
     const float impulseMagnitude = 20.0f; // Upward impulse magnitude
 
-    static int* intPtr = nullptr;
+    static Ptr(int) intPtr = nullptr;
 
     switch (key)
     {
     case ' ': // make colliders jump
-        for (ColliderObject* box : colliders) {
+        for (Ptr(ColliderObject) box : colliders) {
             box->velocity.y += impulseMagnitude;
         }
         break;
@@ -313,6 +314,32 @@ void keyboard(unsigned char key, int x, int y) {
     case 'w':
         std::cout << "\nWalking the heap:" << std::endl;
         MemoryManager::WalkHeap();
+        break;
+    case 'f':
+        if (intPtr != nullptr)
+        {
+            Ptr(void) toCopy = std::malloc(11 * 4);
+            std::memcpy(intPtr, toCopy, 11 * 4);
+            std::cout << "Memory corrupted" << std::endl;
+            std::free(toCopy);
+        }
+        else
+        {
+            std::cout << "Press t first to allocate memory to be corrupted!" << std::endl;
+        }
+        break;
+    case 'h':
+        if (intPtr != nullptr)
+        {
+            Ptr(void) toCopy = std::malloc(11 * 4);
+            std::memcpy(intPtr - 5, toCopy, 11 * 4);
+            std::cout << "Memory corrupted" << std::endl;
+            std::free(toCopy);
+        }
+        else
+        {
+            std::cout << "Press t first to allocate memory to be corrupted!" << std::endl;
+        }
         break;
 #endif
     case 'q': // quits glut main loop (freeglut)
@@ -329,35 +356,9 @@ void keyboard(unsigned char key, int x, int y) {
         intPtr = nullptr;
         std::cout << "Called delete on ptr to 10 int array" << std::endl;
         break;
-    case 'f':
-        if (intPtr != nullptr)
-        {
-            void* toCopy = std::malloc(11 * 4);
-            std::memcpy(intPtr, toCopy, 11 * 4);
-            std::cout << "Memory corrupted" << std::endl;
-            std::free(toCopy);
-        }
-        else
-        {
-            std::cout << "Press t first to allocate memory to be corrupted!" << std::endl;
-        }
-        break;
-    case 'h':
-        if (intPtr != nullptr)
-        {
-            void* toCopy = std::malloc(11 * 4);
-            std::memcpy(intPtr-5, toCopy, 11 * 4);
-            std::cout << "Memory corrupted" << std::endl;
-            std::free(toCopy);
-        }
-        else
-        {
-            std::cout << "Press t first to allocate memory to be corrupted!" << std::endl;
-        }
-        break;
     case 'r':
     {
-        std::vector<ColliderObject*>& boxes = boxColliders->vector;
+        std::vector<Ptr(ColliderObject)>& boxes = boxColliders->vector;
         delete boxes.back();
         boxes.pop_back();
         std::cout << "Removed Box" << std::endl;
@@ -365,14 +366,14 @@ void keyboard(unsigned char key, int x, int y) {
         break;
     case 'a':
     {
-        ColliderObject* box = initColliderObject<Box>();
+        Ptr(ColliderObject) box = initColliderObject<Box>();
         boxColliders->vector.emplace_back(box);
         std::cout << "Added Box" << std::endl;
     }
         break;
     case 'R':
     {
-        std::vector<ColliderObject*>& spheres = sphereColliders->vector;
+        std::vector<Ptr(ColliderObject)>& spheres = sphereColliders->vector;
         delete spheres.back();
         spheres.pop_back();
         std::cout << "Removed Sphere" << std::endl;
@@ -380,7 +381,7 @@ void keyboard(unsigned char key, int x, int y) {
         break;
     case 'A':
     {
-        ColliderObject* sphere = initColliderObject<Sphere>();
+        Ptr(ColliderObject) sphere = initColliderObject<Sphere>();
         sphereColliders->vector.emplace_back(sphere);
         std::cout << "Added Sphere" << std::endl;
     }

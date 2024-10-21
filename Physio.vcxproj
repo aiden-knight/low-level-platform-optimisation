@@ -192,6 +192,7 @@
     <ClInclude Include="MemoryOperators.h" />
     <ClInclude Include="MemoryPool.h" />
     <ClInclude Include="MemoryPoolManager.h" />
+    <ClInclude Include="PointerChecker.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Tracker.h" />

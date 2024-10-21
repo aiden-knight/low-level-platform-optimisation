@@ -69,6 +69,9 @@
     <ClInclude Include="MemoryOperators.h">
       <Filter>Header Files\Memory</Filter>
     </ClInclude>
+    <ClInclude Include="PointerChecker.h">
+      <Filter>Header Files\Debug Only</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">

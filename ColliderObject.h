@@ -5,6 +5,7 @@
 #include <GL/glut.h>
 #include "globals.h"
 #include "LinkedVector.h"
+#include "PointerChecker.h"
 
 class ColliderObject
 {
@@ -71,7 +72,7 @@ public:
 
     virtual void drawMesh() {};
 
-    void update(LinkedVector<ColliderObject*>& colliders, const float& deltaTime)
+    void update(LinkedVector<Ptr(ColliderObject)>& colliders, const float& deltaTime)
     {
         const float floorY = 0.0f;
         // Update velocity due to gravity

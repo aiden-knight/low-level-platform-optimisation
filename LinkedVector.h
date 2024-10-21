@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include "PointerChecker.h"
 
 /// <summary>
 /// Container to wrap around vector to allow linked list of same type vectors that can iterate over all elements in all vectors
@@ -17,10 +18,10 @@ public:
 		using iterator_category = std::random_access_iterator_tag;
 		using value_type = T;
 		using difference_type = std::ptrdiff_t;
-		using pointer = value_type*;
+		using pointer = Ptr(value_type);
 		using reference = value_type&;
 
-		Iterator(LinkedVector<T>* vector) 
+		Iterator(Ptr(LinkedVector<T>) vector)
 		{
 			ptr = vector->beginPtr(); 
 			linkedVec = vector; 
@@ -62,7 +63,7 @@ public:
 		friend bool operator== (const Iterator& left, const Iterator& right) { return left.ptr == right.ptr; }
 		friend bool operator!= (const Iterator& left, const Iterator& right) { return left.ptr != right.ptr; }
 
-		LinkedVector<T>* linkedVec; // current vector (in linked vector container)
+		Ptr(LinkedVector<T>) linkedVec; // current vector (in linked vector container)
 
 	private:
 		pointer ptr; 
@@ -70,12 +71,12 @@ public:
 	};
 
 private:
-	LinkedVector* next;
+	Ptr(LinkedVector) next;
 
 	/// <summary>
 	/// returns stored vectors begin
 	/// </summary>
-	inline T* beginPtr() noexcept
+	inline Ptr(T) beginPtr() noexcept
 	{
 		return vector.data();
 	}
@@ -83,7 +84,7 @@ private:
 	/// <summary>
 	/// returns stored vectors end
 	/// </summary>
-	inline T* endPtr() noexcept
+	inline Ptr(T) endPtr() noexcept
 	{
 		return &vector.data()[vector.size()];
 	}
@@ -95,7 +96,7 @@ public:
 	{
 		next = nullptr;
 	}
-	LinkedVector(LinkedVector* pNext, const unsigned int size = 0) : vector{ size }
+	LinkedVector(Ptr(LinkedVector) pNext, const unsigned int size = 0) : vector{ size }
 	{
 		next = pNext;
 	}
@@ -119,7 +120,7 @@ public:
 
 	inline Iterator end() noexcept 
 	{
-		LinkedVector* end = this;
+		Ptr(LinkedVector) end = this;
 		while (end->next != nullptr) { end = end->next; }
 
 		return Iterator(end->endPtr());
@@ -127,7 +128,7 @@ public:
 
 	void clear()
 	{
-		LinkedVector* linkedVector = this;
+		Ptr(LinkedVector) linkedVector = this;
 		while (linkedVector != nullptr)
 		{
 			linkedVector->vector.clear();
