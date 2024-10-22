@@ -65,12 +65,6 @@
 			m_ptr = ptr;
 		}
 
-		/*Pointer<T>& operator=(const Pointer<T>& other)
-		{
-			m_ptr = other.m_ptr;
-			return *this;
-		}*/
-
 		operator pointer () const 
 		{
 			return m_ptr;
