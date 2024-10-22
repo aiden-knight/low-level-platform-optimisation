@@ -14,6 +14,14 @@ public:
         return Vec3(x - other.x, y - other.y, z - other.z);
     }
 
+    Vec3 operator+(const Vec3& other) const {
+        return Vec3(x + other.x, y + other.y, z + other.z);
+    }
+
+    Vec3 operator/(const float amount) const {
+        return Vec3(x / amount, y / amount, z / amount);
+    }
+
     // Normalize the vector
     void normalise() {
         float length = std::sqrt(x * x + y * y + z * z);
