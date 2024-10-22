@@ -73,7 +73,7 @@ public:
 
     void update(LinkedVector<ColliderObject*>& colliders, const float& deltaTime)
     {
-        const float floorY = 0.0f;
+        const float floorY = minY;
         // Update velocity due to gravity
         velocity.y += gravity * deltaTime;
 
@@ -87,6 +87,11 @@ public:
             position.y = floorY + size.y / 2.0f;
             float dampening = 0.7f;
             velocity.y = -velocity.y * dampening;
+        }
+
+        // ceiling
+        if (position.y + size.y / 2.0f > maxY) {
+            velocity.y = -velocity.y;
         }
 
         // Check for collision with the walls

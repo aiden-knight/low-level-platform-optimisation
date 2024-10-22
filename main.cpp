@@ -162,27 +162,27 @@ void drawScene() {
 
     // Draw the left side wall
     glColor3f(0.5f, 0.5f, 0.5f); // Set the wall color
-    Vec3 leftSideWallV1(minX, 0.0f, maxZ);
-    Vec3 leftSideWallV2(minX, 50.0f, maxZ);
-    Vec3 leftSideWallV3(minX, 50.0f, minZ);
-    Vec3 leftSideWallV4(minX, 0.0f, minZ);
+    Vec3 leftSideWallV1(minX, minY, maxZ);
+    Vec3 leftSideWallV2(minX, maxY, maxZ);
+    Vec3 leftSideWallV3(minX, maxY, minZ);
+    Vec3 leftSideWallV4(minX, minY, minZ);
     drawQuad(leftSideWallV1, leftSideWallV2, leftSideWallV3, leftSideWallV4);
 
     // Draw the right side wall
     glColor3f(0.5f, 0.5f, 0.5f); // Set the wall color
-    Vec3 rightSideWallV1(maxX, 0.0f, maxZ);
-    Vec3 rightSideWallV2(maxX, 50.0f, maxZ);
-    Vec3 rightSideWallV3(maxX, 50.0f, minZ);
-    Vec3 rightSideWallV4(maxX, 0.0f, minZ);
+    Vec3 rightSideWallV1(maxX, minY, maxZ);
+    Vec3 rightSideWallV2(maxX, maxY, maxZ);
+    Vec3 rightSideWallV3(maxX, maxY, minZ);
+    Vec3 rightSideWallV4(maxX, minY, minZ);
     drawQuad(rightSideWallV1, rightSideWallV2, rightSideWallV3, rightSideWallV4);
 
 
     // Draw the back wall
     glColor3f(0.5f, 0.5f, 0.5f); // Set the wall color
-    Vec3 backWallV1(minX, 0.0f, minZ);
-    Vec3 backWallV2(minX, 50.0f, minZ);
-    Vec3 backWallV3(maxX, 50.0f, minZ);
-    Vec3 backWallV4(maxX, 0.0f, minZ);
+    Vec3 backWallV1(minX, minY, minZ);
+    Vec3 backWallV2(minX, maxY, minZ);
+    Vec3 backWallV3(maxX, maxY, minZ);
+    Vec3 backWallV4(maxX, minY, minZ);
     drawQuad(backWallV1, backWallV2, backWallV3, backWallV4);
 
     ColliderObjs& colliders = *boxColliders;
