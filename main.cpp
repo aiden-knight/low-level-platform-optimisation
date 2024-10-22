@@ -257,9 +257,8 @@ void mouse(int button, int state, int x, int y) {
 
         if (clickedBox != nullptr)
         {
-            auto end = colliders.end();
-            auto it = std::find(colliders.begin(), end, clickedBox);
-            if (it != end)
+            auto it = std::find(colliders.begin(), colliders.end(), clickedBox);
+            if (it != colliders.end())
             {
                 std::vector<Ptr(ColliderObject)>& owningVector = it.linkedVec->vector;
                 size_t offset = (it.getPtr() - owningVector.data());

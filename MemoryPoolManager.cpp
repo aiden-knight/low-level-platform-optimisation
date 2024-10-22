@@ -39,6 +39,8 @@ namespace MemoryPoolManager
 
 	void Cleanup()
 	{
+		PrintPoolDebugInfo();
+
 		if (poolPtr != nullptr)
 		{
 			poolPtr->~MemoryPool();

@@ -1,29 +1,75 @@
 #pragma once
+#include <exception>
 
 #ifdef _DEBUG
 #define Ptr(Type) Pointer<Type>
+	/// <summary>
+	/// Pointer Implementation struct to avoid void reference and increment
+	/// </summary>
+	template<typename T>
+	struct PtrImpl
+	{
+		typedef T& reference;
 
-	template <typename T = void>
+		static reference Dereference(T* ptr)
+		{
+			return *ptr;
+		}
+
+		static T* Increment(T* ptr)
+		{
+			return ++ptr;
+		}
+	};
+
+	/// <summary>
+	/// Specifically declare void implementation
+	/// </summary>
+	template<>
+	struct PtrImpl<void>
+	{
+		typedef void reference;
+
+		static reference Dereference(void*)
+		{
+			throw std::exception("Tried to dereference void pointer");
+		}
+
+		static void* Increment(void*)
+		{
+			throw std::exception("Tried to increment void pointer");
+		}
+	};
+
+	/// <summary>
+	/// Wrapper for pointers to check for pointer issues
+	/// </summary>
+	template <typename T>
 	class Pointer
 	{
+	private:
+		using Impl = PtrImpl<T>;
+		using reference = typename Impl::reference;
 		using pointer = T*;
 
-	private:
 		pointer m_ptr = nullptr;
 
 	public:
-		Pointer() = delete;
+		Pointer()
+		{
+			m_ptr = nullptr;
+		}
 
 		Pointer(pointer ptr)
 		{
 			m_ptr = ptr;
 		}
 
-		Pointer<T>& operator=(const Pointer<T>& other)
+		/*Pointer<T>& operator=(const Pointer<T>& other)
 		{
 			m_ptr = other.m_ptr;
 			return *this;
-		}
+		}*/
 
 		operator pointer () const 
 		{
@@ -35,14 +81,22 @@
 			return m_ptr;
 		}
 
-		T& operator* () const
+		reference operator* () const
 		{
-			return *m_ptr;
+			return Impl::Dereference(m_ptr);
 		}
 
 		Pointer<T>& operator++()
 		{
-			return m_ptr++;
+			m_ptr = Impl::Increment(m_ptr);
+			return *this;
+		}
+
+		Pointer<T> operator++(int)
+		{
+			auto temp = *this;
+			++(*this);
+			return temp;
 		}
 
 		bool operator==(const pointer other) const { return m_ptr == other; }
