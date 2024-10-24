@@ -15,12 +15,13 @@
 
 #include "Timer.h"
 #include "LinkedVector.h"
+#include "Octree.h"
 
 using namespace std::chrono;
 
 // this is the number of falling physical items. 
-constexpr unsigned int boxCount = 50;
-constexpr unsigned int sphereCount = 50;
+constexpr unsigned int boxCount = 1000;
+constexpr unsigned int sphereCount = 1000;
 
 // these is where the camera is, where it is looking and the bounds of the continaing box. You shouldn't need to alter these
 constexpr int LOOKAT_X = 10;
@@ -38,6 +39,12 @@ ColliderObjs* boxColliders = new ColliderObjs(sphereColliders, boxCount);
 
 // Fine as box colliders only deleted at end of program
 ColliderObjs& colliders = *boxColliders;
+
+Octree* octree = new Octree(
+    Vec3((maxX - minX) / 2.0f, (maxY - minY) / 2.0f, (maxZ - minZ) / 2.0f), 
+    Vec3(maxX - minX, maxZ - minZ, maxZ - minZ),
+    4
+);
 
 template <class ColliderType>
 ColliderObject* initColliderObject()
@@ -138,8 +145,12 @@ void updatePhysics(const float deltaTime) {
     for (ColliderObject* box : colliders) { 
         if (box == nullptr) continue;
 
-        box->update(colliders, deltaTime);
+        box->update(deltaTime);
+        octree->Insert(box);
+        //box->updateCollisions(colliders);
     }
+    octree->TestCollisions();
+    octree->ResetObjects();
 }
 
 // draw the sides of the containing area
@@ -286,6 +297,9 @@ void cleanup()
         boxColliders = nullptr;
     }
 
+    delete octree;
+    octree = nullptr;
+
 #ifdef _DEBUG
     MemoryManager::Cleanup();
 #endif
@@ -390,7 +404,6 @@ void keyboard(unsigned char key, int x, int y) {
 
 // the main function. 
 int main(int argc, char** argv) {
-
     srand(static_cast<unsigned>(time(0))); // Seed random number generator
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);

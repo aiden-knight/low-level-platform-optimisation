@@ -15,7 +15,7 @@ public:
     Vec3 colour;
 
     // if two colliders collide, push them away from each other
-    void resolveCollision(ColliderObject* a, ColliderObject* b) {
+    static void resolveCollision(ColliderObject* a, ColliderObject* b) {
         Vec3 normal = { a->position.x - b->position.x, a->position.y - b->position.y, a->position.z - b->position.z };
         float length = std::sqrt(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z);
 
@@ -49,10 +49,19 @@ public:
     }
 
     // are two colliders colliding?
-    bool checkCollision(const ColliderObject* a, const ColliderObject* b) {
+    static bool checkCollision(const ColliderObject* a, const ColliderObject* b) {
         return (std::abs(a->position.x - b->position.x) * 2 < (a->size.x + b->size.x)) &&
             (std::abs(a->position.y - b->position.y) * 2 < (a->size.y + b->size.y)) &&
             (std::abs(a->position.z - b->position.z) * 2 < (a->size.z + b->size.z));
+    }
+
+    static bool TestCollision(ColliderObject* a, ColliderObject* b)
+    {
+        if (checkCollision(a, b)) {
+            resolveCollision(a, b);
+            return true;
+        }
+        return false;
     }
 
     // draw the physics object
@@ -71,7 +80,7 @@ public:
 
     virtual void drawMesh() {};
 
-    void update(LinkedVector<ColliderObject*>& colliders, const float& deltaTime)
+    void update(const float& deltaTime)
     {
         const float floorY = minY;
         // Update velocity due to gravity
@@ -101,17 +110,16 @@ public:
         if (position.z - size.z / 2.0f < minZ || position.z + size.z / 2.0f > maxZ) {
             velocity.z = -velocity.z;
         }
+    }
 
+    void updateCollisions(LinkedVector<ColliderObject*>& colliders) {
         // Check for collisions with other colliders
         for (auto it = colliders.begin(); it != colliders.end(); ++it) {
             ColliderObject* other = *it;
             if (other == nullptr) continue;
 
             if (this == other) continue;
-            if (checkCollision(this, other)) {
-                resolveCollision(this, other);
-                break;
-            }
+            if (TestCollision(this, other)) break;
         }
     }
 };

@@ -1,38 +1,167 @@
 #include "Octree.h"
+#include "ColliderObject.h"
 #include <cmath>
+#include <thread>
 
-Octree::Octree(Vec3 position, Vec3 extent, Octree* parent, unsigned int count) :
-	position(position),
-	extent(extent),
-	parent(parent)
+void Octree::InsertObject(Octant* pOctant, ColliderObject* pObj)
 {
-	if (count == 0)
+	unsigned int index = 0;
+	bool straddle = false;
+	for (int i = 0; i < 3; i++)
 	{
-		for (int i = 0; i < 8; i++)
+		float delta = pObj->position[i] - pOctant->centre[i];
+		if (abs(delta) <= pObj->size[i] / 2) 
 		{
-			children[i] = nullptr;
+			straddle = true;
+			break;
 		}
-		return;
+		if (delta > 0.0f) index |= (1 << i); // the side the object is on affects index
 	}
 
-	Octree* givenParent = this;
-	if (count == 1) givenParent = nullptr;
+	// if not straddling and child exists insert deeper
+	if (!straddle && pOctant->children[index])
+	{
+		InsertObject(pOctant->children[index], pObj);
+	}
+	else
+	{
+		pOctant->pObjects = new ObjNode{ pObj, pOctant->pObjects };
+	}
+}
 
-	count--;
-	Vec3 newExtent = extent / 2.0f; // element wise division not length
-	Vec3 newPositions[8] = {
-		position - newExtent,
-		position - Vec3{newExtent.x, newExtent.y, -newExtent.z},
-		position - Vec3{-newExtent.x, newExtent.y, newExtent.z},
-		position - Vec3{-newExtent.x, newExtent.y, -newExtent.z},
-		position + Vec3{newExtent.x, newExtent.y, -newExtent.z},
-		position + Vec3{-newExtent.x, newExtent.y, newExtent.z},
-		position + Vec3{-newExtent.x, newExtent.y, -newExtent.z},
-		position + newExtent
-	};
+void Octree::BuildTree(Octant* pCurrent, const unsigned int depth, const unsigned int maxDepth)
+{
+	Vec3 halfExtent = root.extent / pow(2.0f, depth + 1);
+	Vec3 offset;
+
+	for (unsigned int i = 0; i < 8; i++)
+	{
+		offset.x = ((i & 1) ? halfExtent.x : -halfExtent.x);
+		offset.y = ((i & 2) ? halfExtent.y : -halfExtent.y);
+		offset.z = ((i & 4) ? halfExtent.z : -halfExtent.z);
+		pCurrent->children[i] = new Octant(pCurrent->centre + offset, halfExtent, nullptr);
+
+		if (depth != maxDepth)
+		{
+			BuildTree(pCurrent->children[i], depth + 1, maxDepth);
+		}
+	}
+}
+
+void Octree::TestAllCollisions(Octant* pOctant)
+{
+	constexpr int MAX_DEPTH = 32;
+	static Octant* ancestors[MAX_DEPTH];
+	static int depth = 0;
+
+	ancestors[depth++] = pOctant;
+	for (int d = 0; d < depth; d++)
+	{
+		ObjNode* objA, * objB;
+		for (objA = ancestors[d]->pObjects; objA; objA = objA->pNext)
+		{
+			if (ancestors[d]->pObjects == pOctant->pObjects)
+			{
+				objB = objA->pNext;
+			}
+			else
+			{
+				objB = pOctant->pObjects;
+			}
+
+			for (; objB; objB = objB->pNext)
+			{
+				ColliderObject::TestCollision(objA->pObj, objB->pObj);
+			}
+		}
+	}
 
 	for (int i = 0; i < 8; i++)
 	{
-		children[i] = new Octree(newPositions[i], newExtent, givenParent, count);
+		Octant* child = pOctant->children[i];
+		if (child != nullptr)
+		{
+			TestAllCollisions(child);
+		}
 	}
+
+	depth--;
+}
+
+void Octree::DestroyChildren(Octant* pOctant)
+{
+	for (Octant*& child : pOctant->children)
+	{
+		if (child != nullptr)
+		{
+			DestroyChildren(child);
+			delete child;
+			child = nullptr;
+		}
+	}
+}
+
+void Octree::ClearList(ObjNode* objNode)
+{
+	while (objNode != nullptr)
+	{
+		ObjNode* temp = objNode->pNext;
+		delete objNode;
+		objNode = temp;
+	}
+}
+
+void Octree::ClearLists(Octant* pOctant)
+{
+	for (Octant*& child : pOctant->children)
+	{
+		if (child != nullptr)
+		{
+			ClearLists(child);
+		}
+
+		if (pOctant->pObjects != nullptr)
+		{
+			ClearList(pOctant->pObjects);
+			pOctant->pObjects = nullptr;
+		}
+	}
+}
+
+Octree::Octree(const Vec3 position, const Vec3 extent, const unsigned int maxDepth) :
+	root(position, extent, nullptr)
+{
+	if (maxDepth == 0) return;
+	
+	BuildTree(&root, 1, maxDepth);
+}
+
+Octree::~Octree()
+{
+	DestroyChildren(&root);
+}
+
+void Octree::Insert(ColliderObject* pObj)
+{
+	InsertObject(&root, pObj);
+}
+
+void Octree::TestCollisions()
+{
+	TestAllCollisions(&root);
+}
+
+void Octree::ResetObjects()
+{
+	ClearLists(&root);
+}
+
+Octree::Octant::Octant(Vec3 centre, Vec3 extent, ObjNode* pObjects) : 
+	centre(centre), extent(extent)
+{
+	for (Octant*& child : children)
+	{
+		child = nullptr;
+	}
+	this->pObjects = pObjects;
 }

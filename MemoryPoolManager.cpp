@@ -14,7 +14,7 @@ namespace MemoryPoolManager
 	{
 		void* memory = std::malloc(sizeof(MemoryPool));
 		constexpr size_t chunkSize = 100;
-		constexpr size_t chunkCount = 109;
+		constexpr size_t chunkCount = 4000;
 		poolPtr = new (memory) MemoryPool(chunkSize, chunkCount);
 
 		return 0;

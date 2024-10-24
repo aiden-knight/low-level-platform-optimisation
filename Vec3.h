@@ -22,6 +22,18 @@ public:
         return Vec3(x / amount, y / amount, z / amount);
     }
 
+    inline float operator[](const unsigned int index) const
+    {
+        switch (index) {
+        case 0:
+            return x;
+        case 1:
+            return y;
+        case 2:
+            return z;
+        };
+    }
+
     // Normalize the vector
     void normalise() {
         float length = std::sqrt(x * x + y * y + z * z);
