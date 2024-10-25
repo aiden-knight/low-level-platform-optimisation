@@ -1,6 +1,9 @@
 #include <GL/freeglut.h>
 #include <chrono>
 #include <iostream>
+#include <fstream>
+#include <string>
+#include <ctime>
 
 #include "globals.h"
 #include "Vec3.h"
@@ -31,6 +34,9 @@ constexpr int LOOKAT_Z = 50;
 constexpr int LOOKDIR_X = 10;
 constexpr int LOOKDIR_Y = 0;
 constexpr int LOOKDIR_Z = 0;
+
+unsigned int deltaTimeIndex = 0;
+std::array<float, 50> deltaTimeArray;
 
 using ColliderObjs = LinkedVector<ColliderObject*>;
 
@@ -220,10 +226,40 @@ void display() {
 // NOTE this may be capped at 60 fps as we are using glutPostRedisplay(). If you want it to go higher than this, maybe a thread will help here. 
 void idle() {
     static auto last = steady_clock::now();
-    auto old = last;
-    last = steady_clock::now();
-    const duration<float> frameTime = last - old;
+    const duration<float> frameTime = steady_clock::now() - last;
     float deltaTime = frameTime.count();
+
+    deltaTimeArray[deltaTimeIndex++] = deltaTime;
+    if (deltaTimeIndex == deltaTimeArray.size())
+    {
+        deltaTimeIndex = 0;
+        auto now = std::chrono::system_clock::now();
+       
+
+        float sum = 0;
+        for (int i = 0; i < deltaTimeArray.size(); i++)
+        {
+            sum += deltaTimeArray[i];
+        }
+        sum /= deltaTimeArray.size();
+        sum = 1 / sum;
+
+        time_t rawTime;
+        tm timeInfo;
+        char buffer[80];
+
+        time(&rawTime);
+        localtime_s(&timeInfo, &rawTime);
+        strftime(buffer, 80, "%d-%m-%Y %H-%M-%S", &timeInfo);
+        std::string temp(buffer);
+
+        std::ofstream outStream("logs/" + temp + ".txt");
+        outStream << "Average fps over last " << deltaTimeArray.size() << " frames: " << sum;
+        outStream.close();
+    }
+
+    last = steady_clock::now();
+    
 
     updatePhysics(deltaTime);
 
