@@ -25,7 +25,8 @@ void Octree::InsertObject(Octant* pOctant, ColliderObject* pObj)
 	}
 	else
 	{
-		pOctant->pObjects = new ObjNode{ pObj, pOctant->pObjects };
+		pObj->pNext = pOctant->pObjects;
+		pOctant->pObjects = pObj;
 	}
 }
 
@@ -57,7 +58,7 @@ void Octree::TestAllCollisions(Octant* pOctant)
 	ancestors[depth++] = pOctant;
 	for (int d = 0; d < depth; d++)
 	{
-		ObjNode* objA, * objB;
+		ColliderObject * objA, * objB;
 		for (objA = ancestors[d]->pObjects; objA; objA = objA->pNext)
 		{
 			if (ancestors[d]->pObjects == pOctant->pObjects)
@@ -71,7 +72,7 @@ void Octree::TestAllCollisions(Octant* pOctant)
 
 			for (; objB; objB = objB->pNext)
 			{
-				ColliderObject::TestCollision(objA->pObj, objB->pObj);
+				ColliderObject::TestCollision(objA, objB);
 			}
 		}
 	}
@@ -101,12 +102,12 @@ void Octree::DestroyChildren(Octant* pOctant)
 	}
 }
 
-void Octree::ClearList(ObjNode* objNode)
+void Octree::ClearList(ColliderObject* objNode)
 {
 	while (objNode != nullptr)
 	{
-		ObjNode* temp = objNode->pNext;
-		delete objNode;
+		ColliderObject* temp = objNode->pNext;
+		objNode->pNext = nullptr;
 		objNode = temp;
 	}
 }
@@ -156,7 +157,7 @@ void Octree::ResetObjects()
 	ClearLists(&root);
 }
 
-Octree::Octant::Octant(Vec3 centre, Vec3 extent, ObjNode* pObjects) : 
+Octree::Octant::Octant(Vec3 centre, Vec3 extent, ColliderObject* pObjects) : 
 	centre(centre), extent(extent)
 {
 	for (Octant*& child : children)

@@ -14,6 +14,8 @@ public:
     Vec3 velocity;
     Vec3 colour;
 
+    ColliderObject* pNext = nullptr;
+
     // if two colliders collide, push them away from each other
     static void resolveCollision(ColliderObject* a, ColliderObject* b) {
         Vec3 normal = { a->position.x - b->position.x, a->position.y - b->position.y, a->position.z - b->position.z };

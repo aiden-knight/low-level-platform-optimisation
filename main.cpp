@@ -348,7 +348,7 @@ void initScene(int boxCount, int sphereCount)
     octree = new Octree(
         Vec3((maxX - minX) / 2.0f, (maxY - minY) / 2.0f, (maxZ - minZ) / 2.0f),
         Vec3(maxX - minX, maxZ - minZ, maxZ - minZ),
-        4
+        octreeDepth
     );
 
     for (int i = 0; i < boxCount; ++i) {
