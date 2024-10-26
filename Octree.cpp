@@ -102,30 +102,16 @@ void Octree::DestroyChildren(Octant* pOctant)
 	}
 }
 
-void Octree::ClearList(ColliderObject* objNode)
-{
-	while (objNode != nullptr)
-	{
-		ColliderObject* temp = objNode->pNext;
-		objNode->pNext = nullptr;
-		objNode = temp;
-	}
-}
-
-void Octree::ClearLists(Octant* pOctant)
+void Octree::ClearList(Octant* pOctant)
 {
 	for (Octant*& child : pOctant->children)
 	{
 		if (child != nullptr)
 		{
-			ClearLists(child);
+			ClearList(child);
 		}
 
-		if (pOctant->pObjects != nullptr)
-		{
-			ClearList(pOctant->pObjects);
-			pOctant->pObjects = nullptr;
-		}
+		pOctant->pObjects = nullptr;
 	}
 }
 
@@ -152,9 +138,9 @@ void Octree::TestCollisions()
 	TestAllCollisions(&root);
 }
 
-void Octree::ResetObjects()
+void Octree::ClearLists()
 {
-	ClearLists(&root);
+	ClearList(&root);
 }
 
 Octree::Octant::Octant(Vec3 centre, Vec3 extent, ColliderObject* pObjects) : 

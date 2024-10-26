@@ -112,6 +112,8 @@ public:
         if (position.z - size.z / 2.0f < minZ || position.z + size.z / 2.0f > maxZ) {
             velocity.z = -velocity.z;
         }
+
+        pNext = nullptr;
     }
 
     void updateCollisions(LinkedVector<ColliderObject*>& colliders) {

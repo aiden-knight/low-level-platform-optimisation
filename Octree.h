@@ -23,13 +23,12 @@ class Octree
 	void TestAllCollisions(Octant* pOctant);
 
 	void DestroyChildren(Octant* pOctant);
-	void ClearList(ColliderObject* objNode);
-	void ClearLists(Octant* pOctant);
+	void ClearList(Octant* pOctant);
 public:
 	Octree(const Vec3 position, const Vec3 extent, const unsigned int maxDepth);
 	~Octree();
 
 	void Insert(ColliderObject* pObj);
 	void TestCollisions();
-	void ResetObjects();
+	void ClearLists();
 };

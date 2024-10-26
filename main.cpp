@@ -67,7 +67,7 @@ void updatePhysics(const float deltaTime) {
         //box->updateCollisions(colliders);
     }
     octree->TestCollisions();
-    octree->ResetObjects();
+    octree->ClearLists();
 }
 
 // draw the sides of the containing area
