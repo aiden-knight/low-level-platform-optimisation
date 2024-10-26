@@ -7,8 +7,13 @@ void Octree::InsertObject(Octant* pOctant, ColliderObject* pObj)
 {
 	unsigned int index = 0;
 	bool straddle = false;
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++) // each axis
 	{
+		// get distance between octant's centre and objects position
+		// as octants centre is where the split will be on that axis
+		// if the distance to the axis split is smaller than the
+		// half size of the object, then the object straddles that
+		// splitting axis, so stop checking other axes
 		float delta = pObj->position[i] - pOctant->centre[i];
 		if (abs(delta) <= pObj->size[i] / 2) 
 		{
@@ -25,14 +30,16 @@ void Octree::InsertObject(Octant* pOctant, ColliderObject* pObj)
 	}
 	else
 	{
+		// if there is no more children or the object is
+		// straddling an axis, add to current octants list
 		pObj->pNext = pOctant->pObjects;
 		pOctant->pObjects = pObj;
 	}
 }
 
-void Octree::BuildTree(Octant* pCurrent, const unsigned int depth, const unsigned int maxDepth)
+void Octree::BuildTree(Octant* pCurrent, const Vec3 extent, const unsigned int depth, const unsigned int maxDepth)
 {
-	Vec3 halfExtent = root.extent / pow(2.0f, depth + 1);
+	Vec3 halfExtent = extent / 2.0f;
 	Vec3 offset;
 
 	for (unsigned int i = 0; i < 8; i++)
@@ -40,11 +47,11 @@ void Octree::BuildTree(Octant* pCurrent, const unsigned int depth, const unsigne
 		offset.x = ((i & 1) ? halfExtent.x : -halfExtent.x);
 		offset.y = ((i & 2) ? halfExtent.y : -halfExtent.y);
 		offset.z = ((i & 4) ? halfExtent.z : -halfExtent.z);
-		pCurrent->children[i] = new Octant(pCurrent->centre + offset, halfExtent, nullptr);
+		pCurrent->children[i] = new Octant(pCurrent->centre + offset, nullptr);
 
 		if (depth != maxDepth)
 		{
-			BuildTree(pCurrent->children[i], depth + 1, maxDepth);
+			BuildTree(pCurrent->children[i], halfExtent, depth + 1, maxDepth);
 		}
 	}
 }
@@ -89,13 +96,13 @@ void Octree::TestAllCollisions(Octant* pOctant)
 	depth--;
 }
 
-void Octree::DestroyChildren(Octant* pOctant)
+void Octree::DeleteChildren(Octant* pOctant)
 {
 	for (Octant*& child : pOctant->children)
 	{
 		if (child != nullptr)
 		{
-			DestroyChildren(child);
+			DeleteChildren(child);
 			delete child;
 			child = nullptr;
 		}
@@ -115,36 +122,37 @@ void Octree::ClearList(Octant* pOctant)
 	}
 }
 
-Octree::Octree(const Vec3 position, const Vec3 extent, const unsigned int maxDepth) :
-	root(position, extent, nullptr)
+Octree::Octree(const Vec3 position, const Vec3 extent, const unsigned int maxDepth)
 {
+	root = new Octant(position, nullptr);
 	if (maxDepth == 0) return;
 	
-	BuildTree(&root, 1, maxDepth);
+	BuildTree(root, extent, 1, maxDepth);
 }
 
 Octree::~Octree()
 {
-	DestroyChildren(&root);
+	DeleteChildren(root);
+	delete root;
 }
 
 void Octree::Insert(ColliderObject* pObj)
 {
-	InsertObject(&root, pObj);
+	InsertObject(root, pObj);
 }
 
 void Octree::TestCollisions()
 {
-	TestAllCollisions(&root);
+	TestAllCollisions(root);
 }
 
 void Octree::ClearLists()
 {
-	ClearList(&root);
+	ClearList(root);
 }
 
-Octree::Octant::Octant(Vec3 centre, Vec3 extent, ColliderObject* pObjects) : 
-	centre(centre), extent(extent)
+Octree::Octant::Octant(Vec3 centre, ColliderObject* pObjects) : 
+	centre(centre)
 {
 	for (Octant*& child : children)
 	{
