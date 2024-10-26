@@ -122,5 +122,62 @@ public:
             if (TestCollision(this, other)) break;
         }
     }
+
+    // a ray which is used to tap (by default, remove) a box - see the 'mouse' function for how this is used.
+    bool rayBoxIntersection(const Vec3& rayOrigin, const Vec3& rayDirection)
+    {
+        float tMin = (position.x - size.x / 2.0f - rayOrigin.x) / rayDirection.x;
+        float tMax = (position.x + size.x / 2.0f - rayOrigin.x) / rayDirection.x;
+
+        if (tMin > tMax) std::swap(tMin, tMax);
+
+        float tyMin = (position.y - size.y / 2.0f - rayOrigin.y) / rayDirection.y;
+        float tyMax = (position.y + size.y / 2.0f - rayOrigin.y) / rayDirection.y;
+
+        if (tyMin > tyMax) std::swap(tyMin, tyMax);
+
+        if ((tMin > tyMax) || (tyMin > tMax))
+            return false;
+
+        if (tyMin > tMin)
+            tMin = tyMin;
+
+        if (tyMax < tMax)
+            tMax = tyMax;
+
+        float tzMin = (position.z - size.z / 2.0f - rayOrigin.z) / rayDirection.z;
+        float tzMax = (position.z + size.z / 2.0f - rayOrigin.z) / rayDirection.z;
+
+        if (tzMin > tzMax) std::swap(tzMin, tzMax);
+
+        if ((tMin > tzMax) || (tzMin > tMax))
+            return false;
+
+        return true;
+    }
+
+    template<class ColliderType>
+    static ColliderObject* createCollider()
+    {
+        ColliderObject* obj = new ColliderType();
+
+        // Assign random x, y, and z positions within specified ranges
+        obj->position.x = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
+        obj->position.y = 10.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 1.0f));
+        obj->position.z = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
+
+        obj->size = { 1.0f, 1.0f, 1.0f };
+
+        // Assign random x-velocity between -1.0f and 1.0f
+        float randomXVelocity = -1.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 2.0f));
+        obj->velocity = { randomXVelocity, 0.0f, 0.0f };
+
+        // Assign a random color to the box
+        obj->colour.x = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+        obj->colour.y = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+        obj->colour.z = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+
+        return obj;
+    }
 };
 

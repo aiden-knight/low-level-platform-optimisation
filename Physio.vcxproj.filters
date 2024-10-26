@@ -28,6 +28,9 @@
     <ClCompile Include="Octree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TimeLogger.cpp">
+      <Filter>Source Files\Profiling</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Callbacks.h">
@@ -46,9 +49,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Vec3.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LinkedVector.h">
@@ -75,6 +75,12 @@
     <ClInclude Include="Octree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Timer.h">
+      <Filter>Header Files\Profiling</Filter>
+    </ClInclude>
+    <ClInclude Include="TimeLogger.h">
+      <Filter>Header Files\Profiling</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
@@ -94,6 +100,12 @@
     </Filter>
     <Filter Include="Source Files\Memory">
       <UniqueIdentifier>{ff445278-2e24-49e2-950f-aa8df6eca3f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Profiling">
+      <UniqueIdentifier>{4585121d-d09b-4d99-8f42-f665e8291707}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Profiling">
+      <UniqueIdentifier>{e3327450-de87-4df4-8615-0a3cd077738c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

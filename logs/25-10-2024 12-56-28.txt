@@ -1,1 +1,0 @@
-Average fps over last 50 frames: 19.8443

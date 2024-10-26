@@ -1,9 +1,6 @@
 #include <GL/freeglut.h>
 #include <chrono>
 #include <iostream>
-#include <fstream>
-#include <string>
-#include <ctime>
 
 #include "globals.h"
 #include "Vec3.h"
@@ -17,27 +14,11 @@
 #include "MemoryPoolManager.h"
 
 #include "Timer.h"
+#include "TimeLogger.h"
 #include "LinkedVector.h"
 #include "Octree.h"
 
 using namespace std::chrono;
-
-// this is the number of falling physical items. 
-constexpr unsigned int boxCount = 1000;
-constexpr unsigned int sphereCount = 1000;
-
-// these is where the camera is, where it is looking and the bounds of the continaing box. You shouldn't need to alter these
-constexpr int LOOKAT_X = 10;
-constexpr int LOOKAT_Y = 10;
-constexpr int LOOKAT_Z = 50;
-
-constexpr int LOOKDIR_X = 10;
-constexpr int LOOKDIR_Y = 0;
-constexpr int LOOKDIR_Z = 0;
-
-unsigned int deltaTimeIndex = 0;
-std::array<float, 50> deltaTimeArray;
-
 using ColliderObjs = LinkedVector<ColliderObject*>;
 
 ColliderObjs* sphereColliders = new ColliderObjs(sphereCount);
@@ -46,77 +27,7 @@ ColliderObjs* boxColliders = new ColliderObjs(sphereColliders, boxCount);
 // Fine as box colliders only deleted at end of program
 ColliderObjs& colliders = *boxColliders;
 
-Octree* octree = new Octree(
-    Vec3((maxX - minX) / 2.0f, (maxY - minY) / 2.0f, (maxZ - minZ) / 2.0f), 
-    Vec3(maxX - minX, maxZ - minZ, maxZ - minZ),
-    4
-);
-
-template <class ColliderType>
-ColliderObject* initColliderObject()
-{
-    ColliderObject* obj = new ColliderType();
-
-    // Assign random x, y, and z positions within specified ranges
-    obj->position.x = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
-    obj->position.y = 10.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 1.0f));
-    obj->position.z = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
-
-    obj->size = { 1.0f, 1.0f, 1.0f };
-
-    // Assign random x-velocity between -1.0f and 1.0f
-    float randomXVelocity = -1.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 2.0f));
-    obj->velocity = { randomXVelocity, 0.0f, 0.0f };
-
-    // Assign a random color to the box
-    obj->colour.x = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-    obj->colour.y = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-    obj->colour.z = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-
-    return obj;
-}
-
-void initScene(int boxCount, int sphereCount) {
-    for (int i = 0; i < boxCount; ++i) {
-        (*boxColliders)[i] = initColliderObject<Box>();
-    }
-
-    for (int i = 0; i < sphereCount; ++i) {
-        (*sphereColliders)[i] = initColliderObject<Sphere>();
-    }
-}
-
-// a ray which is used to tap (by default, remove) a box - see the 'mouse' function for how this is used.
-bool rayBoxIntersection(const Vec3& rayOrigin, const Vec3& rayDirection, const ColliderObject* box) {
-    float tMin = (box->position.x - box->size.x / 2.0f - rayOrigin.x) / rayDirection.x;
-    float tMax = (box->position.x + box->size.x / 2.0f - rayOrigin.x) / rayDirection.x;
-
-    if (tMin > tMax) std::swap(tMin, tMax);
-
-    float tyMin = (box->position.y - box->size.y / 2.0f - rayOrigin.y) / rayDirection.y;
-    float tyMax = (box->position.y + box->size.y / 2.0f - rayOrigin.y) / rayDirection.y;
-
-    if (tyMin > tyMax) std::swap(tyMin, tyMax);
-
-    if ((tMin > tyMax) || (tyMin > tMax))
-        return false;
-
-    if (tyMin > tMin)
-        tMin = tyMin;
-
-    if (tyMax < tMax)
-        tMax = tyMax;
-
-    float tzMin = (box->position.z - box->size.z / 2.0f - rayOrigin.z) / rayDirection.z;
-    float tzMax = (box->position.z + box->size.z / 2.0f - rayOrigin.z) / rayDirection.z;
-
-    if (tzMin > tzMax) std::swap(tzMin, tzMax);
-
-    if ((tMin > tzMax) || (tzMin > tMax))
-        return false;
-
-    return true;
-}
+Octree* octree = nullptr;
 
 // used in the 'mouse' tap function to convert a screen point to a point in the world
 Vec3 screenToWorld(int x, int y) {
@@ -161,7 +72,6 @@ void updatePhysics(const float deltaTime) {
 
 // draw the sides of the containing area
 void drawQuad(const Vec3& v1, const Vec3& v2, const Vec3& v3, const Vec3& v4) {
-    
     glBegin(GL_QUADS);
     glVertex3f(v1.x, v1.y, v1.z);
     glVertex3f(v2.x, v2.y, v2.z);
@@ -172,7 +82,6 @@ void drawQuad(const Vec3& v1, const Vec3& v2, const Vec3& v3, const Vec3& v4) {
 
 // draw the entire scene
 void drawScene() {
-
     // Draw the side wall
     GLfloat diffuseMaterial[] = {0.2f, 0.2f, 0.2f, 1.0f};
     glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuseMaterial);
@@ -202,7 +111,6 @@ void drawScene() {
     Vec3 backWallV4(maxX, minY, minZ);
     drawQuad(backWallV1, backWallV2, backWallV3, backWallV4);
 
-    ColliderObjs& colliders = *boxColliders;
     for (ColliderObject* box : colliders) {
         if (box == nullptr) continue;
         box->draw();
@@ -229,37 +137,8 @@ void idle() {
     const duration<float> frameTime = steady_clock::now() - last;
     float deltaTime = frameTime.count();
 
-    deltaTimeArray[deltaTimeIndex++] = deltaTime;
-    if (deltaTimeIndex == deltaTimeArray.size())
-    {
-        deltaTimeIndex = 0;
-        auto now = std::chrono::system_clock::now();
-       
-
-        float sum = 0;
-        for (int i = 0; i < deltaTimeArray.size(); i++)
-        {
-            sum += deltaTimeArray[i];
-        }
-        sum /= deltaTimeArray.size();
-        sum = 1 / sum;
-
-        time_t rawTime;
-        tm timeInfo;
-        char buffer[80];
-
-        time(&rawTime);
-        localtime_s(&timeInfo, &rawTime);
-        strftime(buffer, 80, "%d-%m-%Y %H-%M-%S", &timeInfo);
-        std::string temp(buffer);
-
-        std::ofstream outStream("logs/" + temp + ".txt");
-        outStream << "Average fps over last " << deltaTimeArray.size() << " frames: " << sum;
-        outStream.close();
-    }
-
+    TimeLogger::Update(deltaTime);
     last = steady_clock::now();
-    
 
     updatePhysics(deltaTime);
 
@@ -285,10 +164,9 @@ void mouse(int button, int state, int x, int y) {
         float minIntersectionDistance = std::numeric_limits<float>::max();
 
         ColliderObject* clickedBox = nullptr;
-        ColliderObjs& colliders = *boxColliders;
         for (ColliderObject* box : colliders) {
 
-            if (rayBoxIntersection(cameraPosition, rayDirection, box)) {
+            if (box->rayBoxIntersection(cameraPosition, rayDirection)) {
                 // Calculate the distance between the camera and the intersected box
                 Vec3 diff = box->position - cameraPosition;
                 float distance = diff.length();
@@ -335,6 +213,8 @@ void cleanup()
 
     delete octree;
     octree = nullptr;
+
+    TimeLogger::Destroy();
 
 #ifdef _DEBUG
     MemoryManager::Cleanup();
@@ -415,7 +295,7 @@ void keyboard(unsigned char key, int x, int y) {
         break;
     case 'a':
     {
-        ColliderObject* box = initColliderObject<Box>();
+        ColliderObject* box = ColliderObject::createCollider<Box>();
         boxColliders->vector.emplace_back(box);
         std::cout << "Added Box" << std::endl;
     }
@@ -430,7 +310,7 @@ void keyboard(unsigned char key, int x, int y) {
         break;
     case 'A':
     {
-        ColliderObject* sphere = initColliderObject<Sphere>();
+        ColliderObject* sphere = ColliderObject::createCollider<Sphere>();
         sphereColliders->vector.emplace_back(sphere);
         std::cout << "Added Sphere" << std::endl;
     }
@@ -438,9 +318,8 @@ void keyboard(unsigned char key, int x, int y) {
     }
 }
 
-// the main function. 
-int main(int argc, char** argv) {
-    srand(static_cast<unsigned>(time(0))); // Seed random number generator
+void initGlut(int argc, char** argv)
+{
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(1920, 1080);
@@ -449,7 +328,12 @@ int main(int argc, char** argv) {
 
     glutKeyboardFunc(keyboard);
     glutMouseFunc(mouse);
+    glutDisplayFunc(display);
+    glutIdleFunc(idle);
+}
 
+void initOpenGl()
+{
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
@@ -457,18 +341,43 @@ int main(int argc, char** argv) {
     glLoadIdentity();
     gluPerspective(45.0, 800.0 / 600.0, 0.1, 100.0);
     glMatrixMode(GL_MODELVIEW);
+}
 
-    Timer<std::chrono::steady_clock, std::milli> timer{};
-    initScene(boxCount, sphereCount);
-    std::cout << "Init took: " << timer.Elapsed() << "ms\n" << std::endl;
+void initScene(int boxCount, int sphereCount)
+{
+    octree = new Octree(
+        Vec3((maxX - minX) / 2.0f, (maxY - minY) / 2.0f, (maxZ - minZ) / 2.0f),
+        Vec3(maxX - minX, maxZ - minZ, maxZ - minZ),
+        4
+    );
 
-    glutDisplayFunc(display);
-    glutIdleFunc(idle);
+    for (int i = 0; i < boxCount; ++i) {
+        (*boxColliders)[i] = ColliderObject::createCollider<Box>();
+    }
+
+    for (int i = 0; i < sphereCount; ++i) {
+        (*sphereColliders)[i] = ColliderObject::createCollider<Sphere>();
+    }
+}
+
+// the main function. 
+int main(int argc, char** argv) {
+    srand(static_cast<unsigned>(time(0))); // Seed random number generator
+    initGlut(argc, argv);
+    initOpenGl();
+    
+    TimeLogger::Init();
+
+    {
+        Timer<std::chrono::steady_clock, std::milli> timer{};
+        initScene(boxCount, sphereCount);
+        TimeLogger::LogInit(timer.Elapsed());
+    }
 
     // it will stick here until the program ends. 
     glutMainLoop();
 
+    // cleans up resources in the correct order
     cleanup();
-
     return 0;
 }
