@@ -32,8 +32,7 @@ void Octree::InsertObject(Octant* pOctant, ColliderObject* pObj)
 	{
 		// if there is no more children or the object is
 		// straddling an axis, add to current octants list
-		pObj->pNext = pOctant->pObjects;
-		pOctant->pObjects = pObj;
+		
 	}
 }
 
@@ -159,4 +158,11 @@ Octree::Octant::Octant(Vec3 centre, ColliderObject* pObjects) :
 		child = nullptr;
 	}
 	this->pObjects = pObjects;
+}
+
+void Octree::Octant::AddToList(ColliderObject* pObj)
+{
+	std::lock_guard<std::mutex> lock(listMutex);
+	pObj->pNext = pObjects;
+	pObjects = pObj;
 }

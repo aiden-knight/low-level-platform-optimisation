@@ -17,6 +17,7 @@
 #include "TimeLogger.h"
 #include "LinkedVector.h"
 #include "Octree.h"
+#include "ThreadPool.h"
 
 using namespace std::chrono;
 using ColliderObjs = LinkedVector<ColliderObject*>;
@@ -52,22 +53,17 @@ Vec3 screenToWorld(int x, int y) {
 
 // update the physics: gravity, collision test, collision resolution
 void updatePhysics(const float deltaTime) {
-    
-    // todo for the assessment - use a thread for each sub region
-    // for example, assuming we have two regions:
-    // from 'colliders' create two separate lists
-    // empty each list (from previous frame) and work out which collidable object is in which region, 
-    //  and add the pointer to that region's list.
-    // Then, run two threads with the code below (changing 'colliders' to be the region's list)
+    octree->ClearLists();
     for (ColliderObject* box : colliders) { 
         if (box == nullptr) continue;
 
-        box->update(deltaTime);
-        octree->Insert(box);
+        ThreadPool::PushTask([&] {
+                box->update(deltaTime);
+                octree->Insert(box);
+            });
         //box->updateCollisions(colliders);
     }
     octree->TestCollisions();
-    octree->ClearLists();
 }
 
 // draw the sides of the containing area
@@ -196,6 +192,10 @@ void mouse(int button, int state, int x, int y) {
 
 void cleanup()
 {
+    // wait till threads aren't busy then clean them up
+    while (ThreadPool::Busy());
+    ThreadPool::Destroy();
+
     if (sphereColliders != nullptr && boxColliders != nullptr)
     {
         ColliderObjs& colliders = *boxColliders;
@@ -367,6 +367,7 @@ int main(int argc, char** argv) {
     initOpenGl();
     
     TimeLogger::Init();
+    ThreadPool::Init(threadCount);
 
     {
         Timer<std::chrono::steady_clock, std::milli> timer{};
