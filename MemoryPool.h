@@ -29,4 +29,25 @@ namespace MemoryPoolManager
 
 		Byte* start;
 	};
+
+	class StaticMemoryPool
+	{
+
+		using Byte = unsigned char;
+
+	public:
+		StaticMemoryPool(const size_t chunkSize, const size_t chunkCount);
+		~StaticMemoryPool();
+
+		void* Allocate();
+		bool Free(void* ptr);
+
+	private:
+		const size_t chunkSize;
+		const size_t chunkCount;
+
+		Byte* start;
+		void** freeList;
+		unsigned int freeChunkCount;
+	};
 }

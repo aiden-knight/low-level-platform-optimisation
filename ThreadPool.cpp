@@ -2,7 +2,9 @@
 #include <thread>
 #include <vector>
 #include <queue>
+#include <atomic>
 #include <mutex>
+#include <iostream>
 
 namespace ThreadPool
 {
@@ -14,7 +16,7 @@ namespace ThreadPool
 		std::condition_variable mutexCondition;
 		bool shouldTerminate = false;
 
-		std::atomic<int> pendingJobCount = 0;
+		std::atomic<size_t> taskCount = 0;
 		std::mutex mainThreadMutex;
 		std::condition_variable mainThreadCondition;
 
@@ -26,19 +28,19 @@ namespace ThreadPool
 
 				{
 					std::unique_lock<std::mutex> lock(tasksMutex);
-					mutexCondition.wait(lock, [this] {
+
+					mutexCondition.wait(lock, [this]() {
 						return !tasks.empty() || shouldTerminate;
 						});
+
 					if (shouldTerminate) return;
 
 					task = tasks.front();
 					tasks.pop();
 				}
 				task();
-				if (--pendingJobCount == 0)
-				{
-					mainThreadCondition.notify_one();
-				}
+				--taskCount;
+				mainThreadCondition.notify_one();
 			}
 		}
 
@@ -72,7 +74,7 @@ namespace ThreadPool
 			{
 				std::unique_lock<std::mutex> lock(tasksMutex);
 				tasks.push(task);
-				pendingJobCount++;
+				++taskCount;
 			}
 			mutexCondition.notify_one();
 		}
@@ -89,10 +91,9 @@ namespace ThreadPool
 
 		void WaitForCompletion()
 		{
-			if (pendingJobCount > 0)
+			while (taskCount != 0)
 			{
-				std::unique_lock<std::mutex> lock(mainThreadMutex);
-				mainThreadCondition.wait(lock);
+				
 			}
 		}
 	};
@@ -123,7 +124,7 @@ namespace ThreadPool
 
 	void WaitForCompletion()
 	{
-		
+		pool->WaitForCompletion();
 	}
 
 	void Destroy()

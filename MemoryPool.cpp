@@ -153,4 +153,44 @@ namespace MemoryPoolManager
 			}
 		}
 	}
+
+	StaticMemoryPool::StaticMemoryPool(const size_t chunkSize, const size_t chunkCount) :
+		chunkSize(chunkSize),
+		chunkCount(chunkCount)
+	{
+		start = (Byte*)std::malloc(chunkSize * chunkCount);
+		freeList = (void**)std::malloc(sizeof(void*) * chunkCount);
+		freeChunkCount = 0;
+		if (freeList != nullptr && start != nullptr)
+		{
+			for (size_t i = 0; i < chunkCount; ++i)
+			{
+				freeList[i] = start + (i * chunkSize);
+			}
+			freeChunkCount = chunkCount;
+		}
+	}
+
+	StaticMemoryPool::~StaticMemoryPool()
+	{
+		std::free(start);
+		std::free(freeList);
+	}
+
+	void* StaticMemoryPool::Allocate()
+	{
+		if(freeChunkCount == 0) return nullptr;
+
+		return freeList[--freeChunkCount];
+	}
+
+	bool StaticMemoryPool::Free(void* ptr)
+	{
+		if (start <= ptr && ptr <= start + (chunkSize * chunkCount))
+		{
+			freeList[freeChunkCount++] = ptr;
+			return true;
+		}
+		return false;
+	}
 }

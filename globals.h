@@ -8,8 +8,12 @@ constexpr float minY = 0.0f;
 constexpr float maxY = 50.0f;
 
 // this is the number of falling physical items. 
-constexpr unsigned int boxCount = 1000;
-constexpr unsigned int sphereCount = 1000;
+constexpr unsigned int boxCount = 50;
+constexpr unsigned int sphereCount = 50;
+
+constexpr size_t chunkSize = 100;
+constexpr size_t chunkCount = 100;
+
 constexpr size_t threadCount = 4;
 constexpr unsigned int octreeDepth = 4;
 

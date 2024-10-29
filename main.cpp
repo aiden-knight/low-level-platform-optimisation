@@ -57,13 +57,17 @@ void updatePhysics(const float deltaTime) {
     for (ColliderObject* box : colliders) { 
         if (box == nullptr) continue;
 
-        ThreadPool::PushTask([&] {
+        ThreadPool::PushTask([=] {
                 box->update(deltaTime);
                 octree->Insert(box);
             });
-        //box->updateCollisions(colliders);
     }
+    // wait for all objects to be inserted into the octree
+    ThreadPool::WaitForCompletion();
+    
+    // test all collisions
     octree->TestCollisions();
+    ThreadPool::WaitForCompletion(); // wait for updates before drawing
 }
 
 // draw the sides of the containing area

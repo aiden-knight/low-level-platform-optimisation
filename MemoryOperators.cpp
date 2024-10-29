@@ -18,7 +18,10 @@ void* operator new(size_t size)
 #else
 	void* ptr = MemoryPoolManager::RequestMemory(size);
 	if (ptr == nullptr)
+	{
+		std::cout << "Allocated using malloc not pool " << std::endl;
 		ptr = std::malloc(size);
+	}
 	return ptr;
 #endif // _DEBUG
 }
@@ -45,14 +48,8 @@ void* operator new(size_t size, MemoryManager::TrackerIndex tracker)
 {
 	const size_t allocSize = MemoryManager::GetAllocSize(size);
 	void* ptr = MemoryPoolManager::RequestMemory(allocSize);
-	static bool malloced = false;
 	if (ptr == nullptr)
 	{
-		if (!malloced)
-		{
-			std::cout << "Allocated using malloc not pool " << std::endl;
-			malloced = true;
-		}
 		ptr = std::malloc(allocSize);
 	}
 	

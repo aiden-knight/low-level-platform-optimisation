@@ -2,6 +2,8 @@
 #include "ColliderObject.h"
 #include <cmath>
 #include <thread>
+#include <iostream>
+#include "ThreadPool.h"
 
 void Octree::InsertObject(Octant* pOctant, ColliderObject* pObj)
 {
@@ -32,7 +34,7 @@ void Octree::InsertObject(Octant* pOctant, ColliderObject* pObj)
 	{
 		// if there is no more children or the object is
 		// straddling an axis, add to current octants list
-		
+		pOctant->AddToList(pObj);
 	}
 }
 
@@ -64,23 +66,10 @@ void Octree::TestAllCollisions(Octant* pOctant)
 	ancestors[depth++] = pOctant;
 	for (int d = 0; d < depth; d++)
 	{
-		ColliderObject * objA, * objB;
-		for (objA = ancestors[d]->pObjects; objA; objA = objA->pNext)
-		{
-			if (ancestors[d]->pObjects == pOctant->pObjects)
-			{
-				objB = objA->pNext;
-			}
-			else
-			{
-				objB = pOctant->pObjects;
-			}
-
-			for (; objB; objB = objB->pNext)
-			{
-				ColliderObject::TestCollision(objA, objB);
-			}
-		}
+		Octant* pOther = ancestors[d];
+		ThreadPool::PushTask([=] {
+				pOctant->TestCollisions(pOther);
+			});
 	}
 
 	for (int i = 0; i < 8; i++)
@@ -117,7 +106,7 @@ void Octree::ClearList(Octant* pOctant)
 			ClearList(child);
 		}
 
-		pOctant->pObjects = nullptr;
+		pOctant->ClearList();
 	}
 }
 
@@ -153,6 +142,7 @@ void Octree::ClearLists()
 Octree::Octant::Octant(Vec3 centre, ColliderObject* pObjects) : 
 	centre(centre)
 {
+	children = std::array<Octant*, 8>();
 	for (Octant*& child : children)
 	{
 		child = nullptr;
@@ -162,7 +152,41 @@ Octree::Octant::Octant(Vec3 centre, ColliderObject* pObjects) :
 
 void Octree::Octant::AddToList(ColliderObject* pObj)
 {
-	std::lock_guard<std::mutex> lock(listMutex);
+	std::lock_guard<std::mutex> guard(listMutex);
 	pObj->pNext = pObjects;
 	pObjects = pObj;
+}
+
+void Octree::Octant::TestCollisions(Octant* other)
+{
+	std::lock_guard<std::mutex> guard(listMutex);
+	ColliderObject* objA, *objB;
+	if (this != other)
+	{
+		std::lock_guard<std::mutex> otherGuard(other->listMutex);
+
+		for (objA = other->pObjects; objA; objA = objA->pNext)
+		{
+			for (objB = pObjects; objB; objB = objB->pNext)
+			{
+				ColliderObject::TestCollision(objA, objB);
+			}
+		}
+	}
+	else
+	{
+		for (objA = other->pObjects; objA; objA = objA->pNext)
+		{
+			for (objB = objA->pNext; objB; objB = objB->pNext) // only check each once if is same octant
+			{
+				ColliderObject::TestCollision(objA, objB);
+			}
+		}
+	}
+}
+
+void Octree::Octant::ClearList()
+{
+	std::lock_guard<std::mutex> guard(listMutex);
+	pObjects = nullptr;
 }

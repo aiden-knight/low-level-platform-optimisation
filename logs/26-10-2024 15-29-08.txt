@@ -1,6 +1,0 @@
-Initialisation took (in milliseconds): 45.01
-15-29-11: average fps over last 50 frames: 15.0151
-15-29-13: average fps over last 50 frames: 20.2087
-15-29-16: average fps over last 50 frames: 19.8486
-15-29-19: average fps over last 50 frames: 20.1018
-15-29-21: average fps over last 50 frames: 19.2811

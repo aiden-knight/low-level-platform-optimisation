@@ -27,7 +27,11 @@ namespace TimeLogger
     {
         char buffer[80];
         tm timeInfo = GetTimeInfo();
-        strftime(buffer, sizeof(buffer), "%d-%m-%Y %H-%M-%S", &timeInfo);
+#ifdef _DEBUG
+        strftime(buffer, sizeof(buffer), "%d-%m-%Y %H-%M-%S_DEBUG", &timeInfo);
+#else
+        strftime(buffer, sizeof(buffer), "%d-%m-%Y %H-%M-%S_RELEASE", &timeInfo);
+#endif
         filename = new std::string(buffer);
     }
 

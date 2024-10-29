@@ -2,6 +2,7 @@
 #include "Vec3.h"
 #include <array>
 #include <mutex>
+#include <atomic>
 
 class ColliderObject;
 
@@ -12,12 +13,15 @@ class Octree
 		// don't need to store extent as long as every object is in root node
 		const Vec3 centre;
 		std::array<Octant*, 8> children;
-		ColliderObject* pObjects;
-		std::mutex listMutex;
 
 		Octant(Vec3 centre, ColliderObject* pObjects);
-
 		void AddToList(ColliderObject* pObj);
+		void TestCollisions(Octant* other);
+		void ClearList();
+
+	private:
+		ColliderObject* pObjects;
+		std::mutex listMutex;
 	};
 
 	Octant* root;
