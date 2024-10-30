@@ -1,30 +1,60 @@
 #include "MemoryPoolManager.h"
 #include "MemoryPool.h"
+#include "MemoryManager.h"
 #include "globals.h"
 #include <cstdlib>
 #include "ColliderObject.h"
+#include "Octree.h"
 #include <new> // placement new
+#include <map>
+
 
 namespace MemoryPoolManager
 {
 	namespace
 	{
 		MemoryPool* poolPtr = nullptr;
-		StaticMemoryPool* staticPoolPtr = nullptr;
-		size_t colliderAllocSize;
+
+		constexpr size_t staticPoolCount = 2;
+
+#ifdef _DEBUG
+		constexpr size_t staticPoolSizes[staticPoolCount] = {
+			sizeof(ColliderObject) + sizeof(MemoryManager::Header) + sizeof(MemoryManager::Footer),
+			sizeof(Octree::Octant) + sizeof(MemoryManager::Header) + sizeof(MemoryManager::Footer)
+		};
+#else
+		constexpr size_t staticPoolSizes[staticPoolCount] = {
+			sizeof(ColliderObject),
+			sizeof(Octree::Octant)
+		};
+#endif // _DEBUG
+
+		std::array<StaticMemoryPool*, staticPoolCount> staticPools;
+
+		void* start = nullptr;
+		void* end = nullptr;
 	}
 
 	char InitMemoryPools()
 	{
-		char* memory = (char*)std::malloc(sizeof(MemoryPool) + sizeof(StaticMemoryPool));
-		poolPtr = new (memory) MemoryPool(chunkSize, chunkCount);
+		// allocate enough memory for all pools
+		char* memory = (char*)std::malloc(sizeof(MemoryPool) + (staticPoolCount * sizeof(StaticMemoryPool)));
+		poolPtr = new (memory) MemoryPool(chunkSize, chunkCount); // create dynamic pool
 
-		colliderAllocSize = sizeof(ColliderObject);
-#ifdef _DEBUG
-		colliderAllocSize += 24; // sizeof header and footer
-#endif // _DEBUG
+		// amount of chunks to allocate for static memory pools
+		constexpr unsigned int chunkCounts[staticPoolCount] = {
+			boxCount + sphereCount,
 
-		staticPoolPtr = new (memory + sizeof(MemoryPool)) StaticMemoryPool(colliderAllocSize, boxCount + sphereCount);
+			// Equation for number of octants taken from wolfram, (1 << 3 * ... ) is compile time power of 8
+			(1.0/7.0) * (-1 + (1 << (3*(1 + octreeDepth))))
+		};
+
+		// create static pools
+		char* staticPoolBegin = memory + sizeof(MemoryPool);
+		for (size_t i = 0; i < staticPoolCount; ++i)
+		{
+			staticPools[i] = new (staticPoolBegin + (i * sizeof(StaticMemoryPool))) StaticMemoryPool(staticPoolSizes[i], chunkCounts[i]);
+		}
 
 		return 0;
 	}
@@ -33,51 +63,63 @@ namespace MemoryPoolManager
 	{
 		static char initialised = InitMemoryPools();
 
-		if (size > 4 * chunkSize) return nullptr;
-
-		if (size == colliderAllocSize)
+		// if should be fit into static pool try and place it in there
+		for (size_t i = 0; i < staticPoolCount; ++i)
 		{
-			return staticPoolPtr->Allocate();
+			if (staticPoolSizes[i] == size)
+			{
+				return staticPools[i]->Allocate();
+			}
 		}
-		else
-		{
-			return poolPtr->Allocate(size);
-		}
+		
+		// otherwise try and place it in dynamic pool
+		return poolPtr->Allocate(size);
 	}
 
 	bool FreeMemory(void* ptr)
 	{
-		bool freed = false;
-		if (!freed && staticPoolPtr != nullptr)
+		// if pools already destroyed (aka after main)
+		if (poolPtr == nullptr)
 		{
-			freed = staticPoolPtr->Free(ptr);
+			// returns whether it would have already been freed
+			return ptr >= start && ptr <= end;
 		}
-		if (!freed && poolPtr != nullptr)
+		
+		for (size_t i = 0; i < staticPoolCount; ++i)
 		{
-			freed = poolPtr->Free(ptr);
+			if (staticPools[i]->Free(ptr))
+			{
+				return true;
+			}
 		}
-		return freed;
+
+		return poolPtr->Free(ptr);
 	}
 
 	void PrintPoolDebugInfo()
 	{
 		poolPtr->Print();
+		for (size_t i = 0; i < staticPoolCount; ++i)
+		{
+			staticPools[i]->Print();
+		}
 	}
 
 	void Cleanup()
 	{
 		if (poolPtr != nullptr)
 		{
+			start = poolPtr->start;
+			end = poolPtr->end;
+
 			poolPtr->~MemoryPool();
+			for (size_t i = 0; i < staticPoolCount; ++i)
+			{
+				staticPools[i]->~StaticMemoryPool();
+			}
+
 			std::free(poolPtr);
 			poolPtr = nullptr;
-		}
-
-		if (staticPoolPtr != nullptr)
-		{
-			staticPoolPtr->~StaticMemoryPool();
-			std::free(staticPoolPtr);
-			staticPoolPtr = nullptr;
 		}
 	}
 }

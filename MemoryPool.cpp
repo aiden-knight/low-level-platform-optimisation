@@ -13,7 +13,10 @@ namespace MemoryPoolManager
 	{
 		start = (Byte*)std::malloc(byteCount + (chunkSize * chunkNumber));
 		if (start != nullptr)
+		{
 			std::memset(start, 0, byteCount);
+			end = start + (chunkSize * chunkCount);
+		}
 	}
 
 	MemoryPool::~MemoryPool()
@@ -168,6 +171,8 @@ namespace MemoryPoolManager
 				freeList[i] = start + (i * chunkSize);
 			}
 			freeChunkCount = chunkCount;
+
+			end = start + (chunkSize * chunkCount);
 		}
 	}
 
@@ -186,11 +191,18 @@ namespace MemoryPoolManager
 
 	bool StaticMemoryPool::Free(void* ptr)
 	{
-		if (start <= ptr && ptr <= start + (chunkSize * chunkCount))
+		if (start <= ptr && ptr <= end)
 		{
 			freeList[freeChunkCount++] = ptr;
 			return true;
 		}
 		return false;
+	}
+
+	void StaticMemoryPool::Print()
+	{
+		std::cout << "\nPrinting static pool with chunk size: " << chunkSize << ", and chunk count of: " << chunkCount << std::endl;
+		std::cout << "Pointer to start of first chunk: " << (void*)start << std::endl;
+		std::cout << "Free chunks = " << freeChunkCount << std::endl;
 	}
 }

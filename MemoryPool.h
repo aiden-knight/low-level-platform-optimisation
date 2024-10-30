@@ -9,14 +9,14 @@ namespace MemoryPoolManager
 
 	public:
 		MemoryPool(const size_t chunkSize, const size_t chunkCount);
-
 		~MemoryPool();
 
 		void* Allocate(size_t size);
-
 		bool Free(void* ptr);
-
 		void Print();
+
+		Byte* start;
+		Byte* end;
 
 	private:
 		const size_t chunkSize;
@@ -26,8 +26,6 @@ namespace MemoryPoolManager
 		static constexpr Byte continueMask = 0b01000000;
 		static constexpr Byte occupiedMask = 0b10000000;
 		static constexpr Byte combinedMask = 0b11000000;
-
-		Byte* start;
 	};
 
 	class StaticMemoryPool
@@ -41,12 +39,14 @@ namespace MemoryPoolManager
 
 		void* Allocate();
 		bool Free(void* ptr);
+		void Print();
 
 	private:
 		const size_t chunkSize;
 		const size_t chunkCount;
 
 		Byte* start;
+		Byte* end;
 		void** freeList;
 		unsigned int freeChunkCount;
 	};

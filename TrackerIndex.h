@@ -4,7 +4,8 @@
 #define TRACKERS \
 TI(Default), \
 TI(Box), \
-TI(Sphere)
+TI(Sphere), \
+TI(Octant)
 
 namespace MemoryManager
 {

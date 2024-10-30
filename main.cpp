@@ -53,21 +53,19 @@ Vec3 screenToWorld(int x, int y) {
 
 // update the physics: gravity, collision test, collision resolution
 void updatePhysics(const float deltaTime) {
+
+    ColliderObject::collisionTestCount = 0;
+
     octree->ClearLists();
     for (ColliderObject* box : colliders) { 
         if (box == nullptr) continue;
 
-        ThreadPool::PushTask([=] {
-                box->update(deltaTime);
-                octree->Insert(box);
-            });
+        box->update(deltaTime);
+        octree->Insert(box);
     }
-    // wait for all objects to be inserted into the octree
-    ThreadPool::WaitForCompletion();
-    
-    // test all collisions
     octree->TestCollisions();
-    ThreadPool::WaitForCompletion(); // wait for updates before drawing
+
+    std::cout << "Collision test count: " << ColliderObject::collisionTestCount << std::endl;
 }
 
 // draw the sides of the containing area
@@ -101,7 +99,6 @@ void drawScene() {
     Vec3 rightSideWallV3(maxX, maxY, minZ);
     Vec3 rightSideWallV4(maxX, minY, minZ);
     drawQuad(rightSideWallV1, rightSideWallV2, rightSideWallV3, rightSideWallV4);
-
 
     // Draw the back wall
     glColor3f(0.5f, 0.5f, 0.5f); // Set the wall color
@@ -215,8 +212,11 @@ void cleanup()
         boxColliders = nullptr;
     }
 
-    delete octree;
-    octree = nullptr;
+    if (octree != nullptr)
+    {
+        delete octree;
+        octree = nullptr;
+    }
 
     TimeLogger::Destroy();
 

@@ -4,6 +4,8 @@
 #include <thread>
 #include <iostream>
 #include "ThreadPool.h"
+#include "MemoryOperators.h"
+#include "TrackerIndex.h"
 
 void Octree::InsertObject(Octant* pOctant, ColliderObject* pObj)
 {
@@ -67,9 +69,7 @@ void Octree::TestAllCollisions(Octant* pOctant)
 	for (int d = 0; d < depth; d++)
 	{
 		Octant* pOther = ancestors[d];
-		ThreadPool::PushTask([=] {
-				pOctant->TestCollisions(pOther);
-			});
+		pOctant->TestCollisions(pOther);
 	}
 
 	for (int i = 0; i < 8; i++)
@@ -139,7 +139,14 @@ void Octree::ClearLists()
 	ClearList(root);
 }
 
-Octree::Octant::Octant(Vec3 centre, ColliderObject* pObjects) : 
+#ifdef _DEBUG
+void* Octree::Octant::operator new(size_t size)
+{
+	return ::operator new(size, MemoryManager::TrackerIndex::Octant);
+}
+#endif
+
+Octree::Octant::Octant(Vec3 centre, ColliderObject* pObjects) :
 	centre(centre)
 {
 	children = std::array<Octant*, 8>();

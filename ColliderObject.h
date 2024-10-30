@@ -58,8 +58,11 @@ public:
             (std::abs(a->position.z - b->position.z) * 2 < (a->size.z + b->size.z));
     }
 
+    static unsigned int collisionTestCount;
+
     static bool TestCollision(ColliderObject* a, ColliderObject* b)
     {
+        ++collisionTestCount;
         if (checkCollision(a, b)) {
             resolveCollision(a, b);
             return true;
@@ -76,8 +79,6 @@ public:
         glScalef(size.x, size.y, size.z);
         glRotatef(-90, 1, 0, 0);
         drawMesh();
-        //glutSolidTeapot(1);
-        //glutSolidCone(1, 1, 10, 10);
         glPopMatrix();
     }
 
@@ -121,7 +122,6 @@ public:
         // Check for collisions with other colliders
         for (auto it = colliders.begin(); it != colliders.end(); ++it) {
             ColliderObject* other = *it;
-            if (other == nullptr) continue;
 
             if (this == other) continue;
             if (TestCollision(this, other)) break;

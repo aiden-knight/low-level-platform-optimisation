@@ -10,7 +10,7 @@ namespace TimeLogger
 	{
 		unsigned int deltaTimeIndex = 0;
 		std::array<float, 50> deltaTimeArray;
-        std::string* filename = nullptr;
+        std::ofstream* outStream = nullptr;
 	}
 
     tm GetTimeInfo()
@@ -32,20 +32,24 @@ namespace TimeLogger
 #else
         strftime(buffer, sizeof(buffer), "%d-%m-%Y %H-%M-%S_RELEASE", &timeInfo);
 #endif
-        filename = new std::string(buffer);
+        std::string filename(buffer);
+
+        outStream = new std::ofstream("logs/" + filename + ".txt");
     }
 
     void Destroy()
     {
-        delete filename;
-        filename = nullptr;
+        if (outStream != nullptr)
+        {
+            outStream->close();
+            delete outStream;
+        }
     }
 
     void LogInit(const float initTime)
     {
-        std::ofstream outStream("logs/" + *filename + ".txt");
-        outStream << "Initialisation took (in milliseconds): " << initTime << std::endl;
-        outStream.close();
+        if (outStream == nullptr) return;
+        *outStream << "Initialisation took (in milliseconds): " << initTime << std::endl;
     }
 
     void Update(const float deltaTime)
@@ -54,6 +58,7 @@ namespace TimeLogger
         if (deltaTimeIndex == deltaTimeArray.size())
         {
             deltaTimeIndex = 0;
+            if (outStream == nullptr) return;
 
             float sum = 0;
             for (int i = 0; i < deltaTimeArray.size(); i++)
@@ -63,14 +68,7 @@ namespace TimeLogger
             sum /= deltaTimeArray.size();
             sum = 1 / sum;
 
-            char buffer[50];
-            tm timeInfo = GetTimeInfo();
-            strftime(buffer, sizeof(buffer), "%H-%M-%S", &timeInfo);
-            std::string temp(buffer);
-
-            std::ofstream outStream("logs/" + *filename + ".txt", std::ios::app);
-            outStream << temp << ": average fps over last " << deltaTimeArray.size() << " frames: " << sum << std::endl;
-            outStream.close();
+            *outStream << "Average fps over last " << deltaTimeArray.size() << " frames: " << sum << std::endl;
         }
 	}
 }

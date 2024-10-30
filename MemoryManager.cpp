@@ -9,36 +9,6 @@ namespace MemoryManager
 	constexpr uint32_t headerCheckValue = 0x01ABCDEF;
 	constexpr uint32_t footerCheckValue = 0xFEDCBA10;
 
-	/// <summary>
-	/// Header to track allocation size and relevant memory tracker 
-	/// </summary>
-	struct Header
-	{
-		size_t allocationSize;
-		TrackerIndex trackerIndex;
-
-		Header* next;
-		Header* prev;
-
-		uint32_t checkVal;
-
-		Header(size_t size, TrackerIndex tracker) 
-		{
-			allocationSize = size; 
-			trackerIndex = tracker;
-			checkVal = headerCheckValue;
-			next = nullptr;
-			prev = nullptr;
-		}
-	};
-
-	struct Footer
-	{
-		uint32_t checkVal;
-
-		Footer() { checkVal = footerCheckValue; }
-	};
-
 	namespace // VARIABLES
 	{
 		/// <summary>
@@ -236,6 +206,20 @@ namespace MemoryManager
 			std::free(trackers);
 			trackers = nullptr;
 		}
+	}
+
+	Header::Header(size_t size, TrackerIndex tracker)
+	{
+		allocationSize = size;
+		trackerIndex = tracker;
+		checkVal = headerCheckValue;
+		next = nullptr;
+		prev = nullptr;
+	}
+
+	Footer::Footer()
+	{
+		checkVal = footerCheckValue;
 	}
 }
 

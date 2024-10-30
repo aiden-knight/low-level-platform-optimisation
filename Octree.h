@@ -8,11 +8,16 @@ class ColliderObject;
 
 class Octree
 {
+public:
 	struct Octant
 	{
 		// don't need to store extent as long as every object is in root node
 		const Vec3 centre;
 		std::array<Octant*, 8> children;
+
+#ifdef _DEBUG
+		void* operator new (size_t size);
+#endif
 
 		Octant(Vec3 centre, ColliderObject* pObjects);
 		void AddToList(ColliderObject* pObj);
@@ -24,6 +29,14 @@ class Octree
 		std::mutex listMutex;
 	};
 
+	Octree(const Vec3 position, const Vec3 extent, const unsigned int maxDepth);
+	~Octree();
+
+	void Insert(ColliderObject* pObj);
+	void TestCollisions();
+	void ClearLists();
+
+private:
 	Octant* root;
 
 	void InsertObject(Octant* pOctant, ColliderObject* pObj);
@@ -33,11 +46,4 @@ class Octree
 	void DeleteChildren(Octant* pOctant);
 	void ClearList(Octant* pOctant);
 
-public:
-	Octree(const Vec3 position, const Vec3 extent, const unsigned int maxDepth);
-	~Octree();
-
-	void Insert(ColliderObject* pObj);
-	void TestCollisions();
-	void ClearLists();
 };
