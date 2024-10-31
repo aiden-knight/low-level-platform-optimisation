@@ -1,3 +1,3 @@
 #include "ColliderObject.h"
 
-unsigned int ColliderObject::collisionTestCount = 0;
+std::atomic<unsigned int> ColliderObject::collisionTestCount = 0;

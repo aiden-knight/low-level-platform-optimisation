@@ -1,135 +1,99 @@
 #include "ThreadPool.h"
-#include <thread>
-#include <vector>
-#include <queue>
-#include <atomic>
-#include <mutex>
-#include <iostream>
 
-namespace ThreadPool
+
+ThreadPool* ThreadPool::instance = nullptr;
+
+void ThreadPool::ThreadLoop()
 {
-	class Pool
+	while (!shouldTerminate)
 	{
-		std::vector<std::thread> threads;
-		std::queue<std::function<void()>> tasks;
-		std::mutex tasksMutex;
-		std::condition_variable mutexCondition;
-		bool shouldTerminate = false;
+		std::unique_lock<std::mutex> lock(tasksMutex);
 
-		std::atomic<size_t> taskCount = 0;
-		std::mutex mainThreadMutex;
-		std::condition_variable mainThreadCondition;
-
-		void ThreadLoop()
+		taskCondition.wait(lock, [this]() {
+			return !tasks.empty() || shouldTerminate;
+			});
+		
+		if (!tasks.empty())
 		{
-			while (true)
-			{
-				std::function<void()> task;
+			++taskCount;
+			std::function<void()> task = tasks.front();
+			tasks.pop();
 
-				{
-					std::unique_lock<std::mutex> lock(tasksMutex);
+			lock.unlock();
+			task();
+			lock.lock();
 
-					mutexCondition.wait(lock, [this]() {
-						return !tasks.empty() || shouldTerminate;
-						});
-
-					if (shouldTerminate) return;
-
-					task = tasks.front();
-					tasks.pop();
-				}
-				task();
-				--taskCount;
-				mainThreadCondition.notify_one();
-			}
-		}
-
-	public:
-		Pool(size_t threadCount)
-		{
-			threads = std::vector<std::thread>(threadCount);
-			for (int i = 0; i < threadCount; i++)
-			{
-				threads[i] = std::thread(&Pool::ThreadLoop, this);
-			}
-		}
-
-		~Pool()
-		{
-			{
-				std::unique_lock<std::mutex> lock(tasksMutex);
-				shouldTerminate = true;
-			}
-			mutexCondition.notify_all();
-
-			for (std::thread& thread : threads)
-			{
-				thread.join();
-			}
-			threads.clear();
-		}
-
-		void PushTask(const std::function<void()>& task)
-		{
-			{
-				std::unique_lock<std::mutex> lock(tasksMutex);
-				tasks.push(task);
-				++taskCount;
-			}
-			mutexCondition.notify_one();
-		}
-
-		bool Busy()
-		{
-			bool poolBusy;
-			{
-				std::unique_lock<std::mutex> lock(tasksMutex);
-				poolBusy = !tasks.empty();
-			}
-			return poolBusy;
-		}
-
-		void WaitForCompletion()
-		{
-			while (taskCount != 0)
-			{
-				
-			}
-		}
-	};
-
-	namespace
-	{
-		Pool* pool = nullptr;
-	}
-
-
-	void Init(size_t threadCount)
-	{
-		if (pool == nullptr)
-		{
-			pool = new Pool(threadCount);
+			--taskCount;
+			allTasksFinished.notify_one();
 		}
 	}
+}
 
-	void PushTask(const std::function<void()>& task)
+ThreadPool::ThreadPool(size_t threadCount)
+{
+	threads = std::vector<std::thread>(threadCount);
+	for (int i = 0; i < threadCount; i++)
 	{
-		pool->PushTask(task);
+		threads[i] = std::thread(&ThreadPool::ThreadLoop, this);
 	}
 
-	bool Busy()
-	{
-		return pool->Busy();
-	}
+}
 
-	void WaitForCompletion()
+ThreadPool::~ThreadPool()
+{
 	{
-		pool->WaitForCompletion();
+		std::unique_lock<std::mutex> lock(tasksMutex);
+		shouldTerminate = true;
 	}
+	taskCondition.notify_all();
 
-	void Destroy()
+	for (std::thread& thread : threads)
 	{
-		delete pool;
-		pool = nullptr;
+		thread.join();
 	}
+	threads.clear();
+}
+
+void ThreadPool::PushTask(const std::function<void()>& task)
+{
+	{
+		std::unique_lock<std::mutex> lock(tasksMutex);
+		tasks.push(task);
+	}
+	taskCondition.notify_one();
+}
+
+ThreadPool* ThreadPool::GetInstance()
+{
+	return instance;
+}
+
+ThreadPool* ThreadPool::GetInstance(size_t threadCount)
+{
+	if (instance == nullptr)
+		instance = new ThreadPool(threadCount);
+		
+	return instance;
+}
+
+void ThreadPool::Destruct()
+{
+	delete this;
+	instance = nullptr;
+}
+
+bool ThreadPool::Busy()
+{
+	bool poolBusy;
+	{
+		std::unique_lock<std::mutex> lock(tasksMutex);
+		poolBusy = !tasks.empty();
+	}
+	return poolBusy;
+}
+
+void ThreadPool::WaitForCompletion()
+{
+	std::unique_lock<std::mutex> lock(tasksMutex);
+	allTasksFinished.wait(lock, [this]() { return tasks.empty() && (taskCount == 0); });
 }

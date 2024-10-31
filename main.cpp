@@ -53,9 +53,7 @@ Vec3 screenToWorld(int x, int y) {
 
 // update the physics: gravity, collision test, collision resolution
 void updatePhysics(const float deltaTime) {
-
     ColliderObject::collisionTestCount = 0;
-
     octree->ClearLists();
     for (ColliderObject* box : colliders) { 
         if (box == nullptr) continue;
@@ -64,8 +62,8 @@ void updatePhysics(const float deltaTime) {
         octree->Insert(box);
     }
     octree->TestCollisions();
-
-    std::cout << "Collision test count: " << ColliderObject::collisionTestCount << std::endl;
+    ThreadPool::GetInstance()->WaitForCompletion();
+    //std::cout << "Collision count: " << ColliderObject::collisionTestCount << std::endl;
 }
 
 // draw the sides of the containing area
@@ -193,9 +191,12 @@ void mouse(int button, int state, int x, int y) {
 
 void cleanup()
 {
-    // wait till threads aren't busy then clean them up
-    while (ThreadPool::Busy());
-    ThreadPool::Destroy();
+    if (ThreadPool* pool = ThreadPool::GetInstance())
+    {
+        // wait till threads aren't busy then clean them up
+        while (pool->Busy());
+        pool->Destruct();
+    }
 
     if (sphereColliders != nullptr && boxColliders != nullptr)
     {
@@ -371,7 +372,7 @@ int main(int argc, char** argv) {
     initOpenGl();
     
     TimeLogger::Init();
-    ThreadPool::Init(threadCount);
+    ThreadPool::GetInstance(threadCount);
 
     {
         Timer<std::chrono::steady_clock, std::milli> timer{};

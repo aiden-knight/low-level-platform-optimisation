@@ -14,19 +14,17 @@ public:
 		// don't need to store extent as long as every object is in root node
 		const Vec3 centre;
 		std::array<Octant*, 8> children;
+		Octant* parent;
+		ColliderObject* pObjects;
 
 #ifdef _DEBUG
 		void* operator new (size_t size);
 #endif
 
-		Octant(Vec3 centre, ColliderObject* pObjects);
+		Octant(Vec3 centre, Octant* parent, ColliderObject* pObjects);
 		void AddToList(ColliderObject* pObj);
 		void TestCollisions(Octant* other);
 		void ClearList();
-
-	private:
-		ColliderObject* pObjects;
-		std::mutex listMutex;
 	};
 
 	Octree(const Vec3 position, const Vec3 extent, const unsigned int maxDepth);
@@ -38,6 +36,7 @@ public:
 
 private:
 	Octant* root;
+	std::mutex rootMutex;
 
 	void InsertObject(Octant* pOctant, ColliderObject* pObj);
 	void BuildTree(Octant* pCurrent, const Vec3 extent, const unsigned int depth, const unsigned int maxDepth);

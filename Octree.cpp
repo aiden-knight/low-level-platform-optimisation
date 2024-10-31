@@ -50,7 +50,7 @@ void Octree::BuildTree(Octant* pCurrent, const Vec3 extent, const unsigned int d
 		offset.x = ((i & 1) ? halfExtent.x : -halfExtent.x);
 		offset.y = ((i & 2) ? halfExtent.y : -halfExtent.y);
 		offset.z = ((i & 4) ? halfExtent.z : -halfExtent.z);
-		pCurrent->children[i] = new Octant(pCurrent->centre + offset, nullptr);
+		pCurrent->children[i] = new Octant(pCurrent->centre + offset, pCurrent, nullptr);
 
 		if (depth != maxDepth)
 		{
@@ -61,15 +61,17 @@ void Octree::BuildTree(Octant* pCurrent, const Vec3 extent, const unsigned int d
 
 void Octree::TestAllCollisions(Octant* pOctant)
 {
-	constexpr int MAX_DEPTH = 32;
-	static Octant* ancestors[MAX_DEPTH];
-	static int depth = 0;
-
-	ancestors[depth++] = pOctant;
-	for (int d = 0; d < depth; d++)
+	for (Octant* other = pOctant; other; other = other->parent)
 	{
-		Octant* pOther = ancestors[d];
-		pOctant->TestCollisions(pOther);
+		if (other == root)
+		{
+			std::lock_guard <std::mutex> guard(rootMutex);
+			pOctant->TestCollisions(other);
+		}
+		else
+		{
+			pOctant->TestCollisions(other);
+		}
 	}
 
 	for (int i = 0; i < 8; i++)
@@ -77,11 +79,18 @@ void Octree::TestAllCollisions(Octant* pOctant)
 		Octant* child = pOctant->children[i];
 		if (child != nullptr)
 		{
-			TestAllCollisions(child);
+			if (pOctant == root)
+			{
+				ThreadPool::GetInstance()->PushTask([this, child]() {
+					TestAllCollisions(child);
+				});
+			}
+			else
+			{
+				TestAllCollisions(child);
+			}
 		}
 	}
-
-	depth--;
 }
 
 void Octree::DeleteChildren(Octant* pOctant)
@@ -112,7 +121,7 @@ void Octree::ClearList(Octant* pOctant)
 
 Octree::Octree(const Vec3 position, const Vec3 extent, const unsigned int maxDepth)
 {
-	root = new Octant(position, nullptr);
+	root = new Octant(position, nullptr, nullptr);
 	if (maxDepth == 0) return;
 	
 	BuildTree(root, extent, 1, maxDepth);
@@ -146,7 +155,7 @@ void* Octree::Octant::operator new(size_t size)
 }
 #endif
 
-Octree::Octant::Octant(Vec3 centre, ColliderObject* pObjects) :
+Octree::Octant::Octant(Vec3 centre, Octant* parent, ColliderObject* pObjects) :
 	centre(centre)
 {
 	children = std::array<Octant*, 8>();
@@ -155,45 +164,37 @@ Octree::Octant::Octant(Vec3 centre, ColliderObject* pObjects) :
 		child = nullptr;
 	}
 	this->pObjects = pObjects;
+	this->parent = parent;
 }
 
 void Octree::Octant::AddToList(ColliderObject* pObj)
 {
-	std::lock_guard<std::mutex> guard(listMutex);
 	pObj->pNext = pObjects;
 	pObjects = pObj;
 }
 
 void Octree::Octant::TestCollisions(Octant* other)
 {
-	std::lock_guard<std::mutex> guard(listMutex);
-	ColliderObject* objA, *objB;
-	if (this != other)
+	ColliderObject* objA, * objB;
+	for (objA = other->pObjects; objA; objA = objA->pNext)
 	{
-		std::lock_guard<std::mutex> otherGuard(other->listMutex);
-
-		for (objA = other->pObjects; objA; objA = objA->pNext)
+		if (this != other)
 		{
-			for (objB = pObjects; objB; objB = objB->pNext)
-			{
-				ColliderObject::TestCollision(objA, objB);
-			}
+			objB = this->pObjects;
 		}
-	}
-	else
-	{
-		for (objA = other->pObjects; objA; objA = objA->pNext)
+		else
 		{
-			for (objB = objA->pNext; objB; objB = objB->pNext) // only check each once if is same octant
-			{
-				ColliderObject::TestCollision(objA, objB);
-			}
+			objB = objA->pNext;
+		}
+
+		for (; objB; objB = objB->pNext)
+		{
+			ColliderObject::TestCollision(objA, objB);
 		}
 	}
 }
 
 void Octree::Octant::ClearList()
 {
-	std::lock_guard<std::mutex> guard(listMutex);
 	pObjects = nullptr;
 }

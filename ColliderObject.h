@@ -1,11 +1,11 @@
 #pragma once
-
 #include "Vec3.h"
 #include <array>
 #include <GL/glut.h>
 #include "globals.h"
-#include <mutex>
 #include "LinkedVector.h"
+#include <mutex>
+#include <atomic>
 
 class ColliderObject
 {
@@ -58,7 +58,7 @@ public:
             (std::abs(a->position.z - b->position.z) * 2 < (a->size.z + b->size.z));
     }
 
-    static unsigned int collisionTestCount;
+    static std::atomic<unsigned int> collisionTestCount;
 
     static bool TestCollision(ColliderObject* a, ColliderObject* b)
     {
