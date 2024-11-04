@@ -17,7 +17,6 @@
 #include "TimeLogger.h"
 #include "LinkedVector.h"
 #include "Octree.h"
-#include "ThreadPool.h"
 
 using namespace std::chrono;
 using ColliderObjs = LinkedVector<ColliderObject*>;
@@ -188,10 +187,6 @@ void mouse(int button, int state, int x, int y) {
 
 void cleanup()
 {
-    // wait till threads aren't busy then clean them up
-    while (ThreadPool::Busy());
-    ThreadPool::Destroy();
-
     if (sphereColliders != nullptr && boxColliders != nullptr)
     {
         ColliderObjs& colliders = *boxColliders;
@@ -366,7 +361,6 @@ int main(int argc, char** argv) {
     initOpenGl();
     
     TimeLogger::Init();
-    ThreadPool::Init(threadCount);
 
     {
         Timer<std::chrono::steady_clock, std::milli> timer{};
