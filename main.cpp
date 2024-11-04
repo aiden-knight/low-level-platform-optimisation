@@ -53,9 +53,6 @@ Vec3 screenToWorld(int x, int y) {
 
 // update the physics: gravity, collision test, collision resolution
 void updatePhysics(const float deltaTime) {
-
-    ColliderObject::collisionTestCount = 0;
-
     octree->ClearLists();
     for (ColliderObject* box : colliders) { 
         if (box == nullptr) continue;
@@ -64,8 +61,6 @@ void updatePhysics(const float deltaTime) {
         octree->Insert(box);
     }
     octree->TestCollisions();
-
-    std::cout << "Collision test count: " << ColliderObject::collisionTestCount << std::endl;
 }
 
 // draw the sides of the containing area
