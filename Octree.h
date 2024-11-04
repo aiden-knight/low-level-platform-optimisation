@@ -1,8 +1,11 @@
 #pragma once
 #include "Vec3.h"
+#include "globals.h"
 #include <array>
 #include <mutex>
+#include <thread>
 #include <atomic>
+#include <queue>
 
 class ColliderObject;
 
@@ -19,15 +22,17 @@ public:
 		void* operator new (size_t size);
 #endif
 
-		Octant(Vec3 centre, ColliderObject* pObjects);
+		Octant(Vec3 centre, Octant* parent);
 		void AddToList(ColliderObject* pObj);
-		void TestCollisions(Octant* other);
+		void TestCollisions();
 		void ClearList();
 
 	private:
 		ColliderObject* pObjects;
+		Octant* pParent;
 		std::mutex listMutex;
 	};
+
 
 	Octree(const Vec3 position, const Vec3 extent, const unsigned int maxDepth);
 	~Octree();
@@ -35,6 +40,19 @@ public:
 	void Insert(ColliderObject* pObj);
 	void TestCollisions();
 	void ClearLists();
+
+private:
+	std::array<std::thread, threadCount> threads;
+	std::queue<Octant*> octantQueue;
+	std::mutex queueMutex;
+	std::condition_variable queueUpdateCondition;
+
+	std::condition_variable collisionsTested;
+
+	bool shouldTerminate = false;
+	unsigned int busyThreads = 0;
+
+	void ThreadLoop();
 
 private:
 	Octant* root;
