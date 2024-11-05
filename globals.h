@@ -14,8 +14,9 @@ constexpr unsigned int sphereCount = 3000;
 constexpr size_t chunkSize = 100;
 constexpr size_t chunkCount = 100;
 
-constexpr size_t threadCount = 4;
+constexpr size_t threadCount = 8;
 constexpr unsigned int octreeDepth = 4;
+constexpr size_t maxTasks = 8;
 
 // these is where the camera is, where it is looking and the bounds of the continaing box. You shouldn't need to alter these
 constexpr int LOOKAT_X = 10;
