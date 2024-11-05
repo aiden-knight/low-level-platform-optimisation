@@ -251,6 +251,7 @@ void Octree::Octant::TestCollisions()
 			}
 		}
 
+		others[index] = nullptr;
 		--otherCount;
 	}
 }
