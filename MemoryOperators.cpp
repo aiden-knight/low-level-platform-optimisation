@@ -19,7 +19,7 @@ void* operator new(size_t size)
 	void* ptr = MemoryPoolManager::RequestMemory(size);
 	if (ptr == nullptr)
 	{
-		std::cout << "Allocated using malloc not pool " << std::endl;
+		std::cout << "Allocated using malloc not pool " << size << std::endl;
 		ptr = std::malloc(size);
 	}
 	return ptr;
@@ -56,6 +56,7 @@ void* operator new(size_t size, MemoryManager::TrackerIndex tracker)
 	if (ptr == nullptr)
 	{
 		ptr = std::malloc(allocSize);
+		std::cout << "Allocated using malloc not pool " << size << std::endl;
 	}
 	
 	return MemoryManager::UpdateTrackerAllocation(ptr, size, tracker);

@@ -1,8 +1,11 @@
 #pragma once
 #include "Vec3.h"
+#include "globals.h"
 #include <array>
 #include <mutex>
+#include <thread>
 #include <atomic>
+#include <queue>
 
 class ColliderObject;
 
@@ -14,18 +17,22 @@ public:
 		// don't need to store extent as long as every object is in root node
 		const Vec3 centre;
 		std::array<Octant*, 8> children;
-		Octant* parent;
-		ColliderObject* pObjects;
 
 #ifdef _DEBUG
 		void* operator new (size_t size);
 #endif
 
-		Octant(Vec3 centre, Octant* parent, ColliderObject* pObjects);
+		Octant(Vec3 centre, Octant* parent);
 		void AddToList(ColliderObject* pObj);
-		void TestCollisions(Octant* other);
+		void TestCollisions();
 		void ClearList();
+
+	private:
+		ColliderObject* pObjects;
+		Octant* pParent;
+		std::mutex listMutex;
 	};
+
 
 	Octree(const Vec3 position, const Vec3 extent, const unsigned int maxDepth);
 	~Octree();
@@ -35,8 +42,20 @@ public:
 	void ClearLists();
 
 private:
+	std::array<std::thread, threadCount> threads;
+	std::queue<Octant*> octantQueue;
+	std::mutex queueMutex;
+	std::condition_variable queueUpdateCondition;
+
+	std::condition_variable collisionsTested;
+
+	bool shouldTerminate = false;
+	unsigned int busyThreads = 0;
+
+	void ThreadLoop();
+
+private:
 	Octant* root;
-	std::mutex rootMutex;
 
 	void InsertObject(Octant* pOctant, ColliderObject* pObj);
 	void BuildTree(Octant* pCurrent, const Vec3 extent, const unsigned int depth, const unsigned int maxDepth);

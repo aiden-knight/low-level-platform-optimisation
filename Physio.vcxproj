@@ -182,7 +182,6 @@
     <ClCompile Include="MemoryPoolManager.cpp" />
     <ClCompile Include="Octree.cpp" />
     <ClCompile Include="Sphere.cpp" />
-    <ClCompile Include="ThreadPool.cpp" />
     <ClCompile Include="TimeLogger.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -197,7 +196,6 @@
     <ClInclude Include="MemoryPoolManager.h" />
     <ClInclude Include="Octree.h" />
     <ClInclude Include="Sphere.h" />
-    <ClInclude Include="ThreadPool.h" />
     <ClInclude Include="TimeLogger.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Tracker.h" />

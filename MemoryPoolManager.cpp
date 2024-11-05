@@ -7,7 +7,8 @@
 #include "Octree.h"
 #include <new> // placement new
 #include <map>
-#include <functional>
+#include <queue>
+
 
 namespace MemoryPoolManager
 {
@@ -16,18 +17,19 @@ namespace MemoryPoolManager
 		MemoryPool* poolPtr = nullptr;
 
 		constexpr size_t staticPoolCount = 3;
+		constexpr size_t octantQueueBlockSize = std::queue<Octree::Octant*>::container_type::_EEN_DS;
 
 #ifdef _DEBUG
 		constexpr size_t staticPoolSizes[staticPoolCount] = {
 			sizeof(ColliderObject) + sizeof(MemoryManager::Header) + sizeof(MemoryManager::Footer),
 			sizeof(Octree::Octant) + sizeof(MemoryManager::Header) + sizeof(MemoryManager::Footer),
-			sizeof(std::function<void()>) + sizeof(MemoryManager::Header) + sizeof(MemoryManager::Footer)
+			(octantQueueBlockSize * sizeof(Octree::Octant*)) + sizeof(MemoryManager::Header) + sizeof(MemoryManager::Footer)
 		};
 #else
 		constexpr size_t staticPoolSizes[staticPoolCount] = {
 			sizeof(ColliderObject),
 			sizeof(Octree::Octant),
-			sizeof(std::function<void()>)
+			octantQueueBlockSize * sizeof(Octree::Octant*)
 		};
 #endif // _DEBUG
 
@@ -48,8 +50,8 @@ namespace MemoryPoolManager
 			boxCount + sphereCount,
 
 			// Equation for number of octants taken from wolfram, (1 << 3 * ... ) is compile time power of 8
-			(1.0/7.0) * (-1 + (1 << (3*(1 + octreeDepth)))),
-			maxTasks
+			(1.0 / 7.0) * (-1 + (1 << (3 * (1 + octreeDepth)))),
+			((1.0 / 7.0) * (-1 + (1 << (3 * (1 + octreeDepth)))) / octantQueueBlockSize) + 3
 		};
 
 		// create static pools
@@ -76,6 +78,7 @@ namespace MemoryPoolManager
 		}
 		
 		// otherwise try and place it in dynamic pool
+		if (size > (chunkSize * 4)) return nullptr;
 		return poolPtr->Allocate(size);
 	}
 
