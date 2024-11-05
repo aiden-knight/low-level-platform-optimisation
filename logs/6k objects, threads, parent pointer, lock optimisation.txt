@@ -1,0 +1,19 @@
+Initialisation took (in milliseconds): 3.3161
+Average fps over last 50 frames: 41.2381
+Average fps over last 50 frames: 60.3903
+Average fps over last 50 frames: 59.2617
+Average fps over last 50 frames: 60.7741
+Average fps over last 50 frames: 59.5512
+Average fps over last 50 frames: 60.4365
+Average fps over last 50 frames: 59.3878
+Average fps over last 50 frames: 60.4479
+Average fps over last 50 frames: 60.2001
+Average fps over last 50 frames: 57.3843
+Average fps over last 50 frames: 58.347
+Average fps over last 50 frames: 60.7107
+Average fps over last 50 frames: 59.9357
+Average fps over last 50 frames: 60.2956
+Average fps over last 50 frames: 59.8404
+Average fps over last 50 frames: 59.7052
+Average fps over last 50 frames: 60.4789
+Average fps over last 50 frames: 60.0077
