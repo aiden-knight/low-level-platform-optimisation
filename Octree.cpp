@@ -136,6 +136,7 @@ Octree::Octree(const Vec3 position, const Vec3 extent, const unsigned int maxDep
 		BuildTree(root, extent, 1, maxDepth);
 	}
 	
+	threads.resize(threadCount);
 	for (std::thread& thread : threads)
 	{
 		thread = std::thread(&Octree::ThreadLoop, this);
@@ -205,7 +206,7 @@ void Octree::Octant::AddToList(ColliderObject* pObj)
 
 void Octree::Octant::TestCollisions()
 {
-	std::array<Octant*, octreeDepth + 1> others{};
+	std::array<Octant*, maxOctantDepth> others{};
 	unsigned int otherCount = 0;
 
 	for (Octant* other = this; other; other = other->pParent)

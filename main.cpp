@@ -21,11 +21,13 @@
 using namespace std::chrono;
 using ColliderObjs = LinkedVector<ColliderObject*>;
 
-ColliderObjs* sphereColliders = new ColliderObjs(sphereCount);
-ColliderObjs* boxColliders = new ColliderObjs(sphereColliders, boxCount);
+ColliderObjs* sphereColliders = nullptr;
+ColliderObjs* boxColliders = nullptr;
 
-// Fine as box colliders only deleted at end of program
-ColliderObjs& colliders = *boxColliders;
+unsigned int boxCount = 3000;
+unsigned int sphereCount = 3000;
+size_t threadCount = 4;
+unsigned int octreeDepth = 4;
 
 Octree* octree = nullptr;
 
@@ -53,6 +55,8 @@ Vec3 screenToWorld(int x, int y) {
 // update the physics: gravity, collision test, collision resolution
 void updatePhysics(const float deltaTime) {
     octree->ClearLists();
+
+    ColliderObjs& colliders = *boxColliders;
     for (ColliderObject* box : colliders) { 
         if (box == nullptr) continue;
 
@@ -102,6 +106,7 @@ void drawScene() {
     Vec3 backWallV4(maxX, minY, minZ);
     drawQuad(backWallV1, backWallV2, backWallV3, backWallV4);
 
+    ColliderObjs& colliders = *boxColliders;
     for (ColliderObject* box : colliders) {
         if (box == nullptr) continue;
         box->draw();
@@ -155,6 +160,7 @@ void mouse(int button, int state, int x, int y) {
         float minIntersectionDistance = std::numeric_limits<float>::max();
 
         ColliderObject* clickedBox = nullptr;
+        ColliderObjs& colliders = *boxColliders;
         for (ColliderObject* box : colliders) {
 
             if (box->rayBoxIntersection(cameraPosition, rayDirection)) {
@@ -225,9 +231,12 @@ void keyboard(unsigned char key, int x, int y) {
     switch (key)
     {
     case ' ': // make colliders jump
+    {
+        ColliderObjs& colliders = *boxColliders;
         for (ColliderObject* box : colliders) {
             box->velocity.y += impulseMagnitude;
         }
+    }
         break;
 #ifdef _DEBUG
     case 'm': // display memory allocation info
@@ -339,6 +348,9 @@ void initOpenGl()
 
 void initScene(int boxCount, int sphereCount)
 {
+    sphereColliders = new ColliderObjs(sphereCount);
+    boxColliders = new ColliderObjs(sphereColliders, boxCount);
+
     octree = new Octree(
         Vec3((maxX - minX) / 2.0f, (maxY - minY) / 2.0f, (maxZ - minZ) / 2.0f),
         Vec3(maxX - minX, maxZ - minZ, maxZ - minZ),
@@ -354,8 +366,32 @@ void initScene(int boxCount, int sphereCount)
     }
 }
 
+bool getConstants()
+{
+    std::cout << "Number of spheres: ";
+    std::cin >> sphereCount;
+    std::cout << "Number of cubes: ";
+    std::cin >> boxCount;
+    std::cout << "Octree depth: ";
+    std::cin >> octreeDepth;
+    if (octreeDepth >= maxOctantDepth)
+    {
+        return false;
+    }
+    std::cout << "Thread count: ";
+    std::cin >> threadCount;
+    MemoryPoolManager::Init();
+    return true;
+}
+
 // the main function. 
 int main(int argc, char** argv) {
+    if (!getConstants())
+    {
+        std::cout << "\nOctree depth too large exiting!" << std::endl;
+        return 0;
+    }
+
     srand(static_cast<unsigned>(time(0))); // Seed random number generator
     initGlut(argc, argv);
     initOpenGl();

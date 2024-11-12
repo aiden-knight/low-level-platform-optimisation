@@ -42,7 +42,7 @@ public:
 	void ClearLists();
 
 private:
-	std::array<std::thread, threadCount> threads;
+	std::vector<std::thread> threads;
 	std::queue<Octant*> octantQueue;
 	std::mutex queueMutex;
 	std::condition_variable queueUpdateCondition;

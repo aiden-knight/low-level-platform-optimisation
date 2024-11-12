@@ -2,6 +2,8 @@
 
 namespace MemoryPoolManager
 {
+	void Init();
+
 	void* RequestMemory(size_t size);
 
 	/// <summary>
