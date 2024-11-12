@@ -366,7 +366,7 @@ void initScene(int boxCount, int sphereCount)
     }
 }
 
-bool getConstants()
+int getConstants()
 {
     std::cout << "Number of spheres: ";
     std::cin >> sphereCount;
@@ -376,19 +376,28 @@ bool getConstants()
     std::cin >> octreeDepth;
     if (octreeDepth >= maxOctantDepth)
     {
-        return false;
+        return 1;
     }
     std::cout << "Thread count: ";
     std::cin >> threadCount;
+    if (threadCount == 0)
+    {
+        return 2;
+    }
     MemoryPoolManager::Init();
-    return true;
+    return 0;
 }
 
 // the main function. 
 int main(int argc, char** argv) {
-    if (!getConstants())
+    int ret = getConstants();
+    switch(ret)
     {
-        std::cout << "\nOctree depth too large exiting!" << std::endl;
+    case 1:
+        std::cout << "\nOctree depth too large, exiting!" << std::endl;
+        return 0;
+    case 2:
+        std::cout << "\Thread count must not be 0, exiting!" << std::endl;
         return 0;
     }
 
