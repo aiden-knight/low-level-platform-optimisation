@@ -47,10 +47,6 @@ void operator delete(void* ptr)
 void* operator new(size_t size, MemoryManager::TrackerIndex tracker)
 {
 	const size_t allocSize = MemoryManager::GetAllocSize(size);
-	if (tracker == MemoryManager::Default)
-	{
-		std::cout << "Default Alloc: " << size << std::endl;
-	}
 
 	void* ptr = MemoryPoolManager::RequestMemory(allocSize);
 	if (ptr == nullptr)

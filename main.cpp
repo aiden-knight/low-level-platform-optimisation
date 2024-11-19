@@ -24,8 +24,8 @@ using ColliderObjs = LinkedVector<ColliderObject*>;
 ColliderObjs* sphereColliders = nullptr;
 ColliderObjs* boxColliders = nullptr;
 
-unsigned int boxCount = 3000;
-unsigned int sphereCount = 3000;
+unsigned int boxCount = 0;
+unsigned int sphereCount = 0;
 size_t threadCount = 4;
 unsigned int octreeDepth = 4;
 
@@ -132,11 +132,12 @@ void idle() {
     static auto last = steady_clock::now();
     const duration<float> frameTime = steady_clock::now() - last;
     float deltaTime = frameTime.count();
-
-    TimeLogger::Update(deltaTime);
     last = steady_clock::now();
 
+
     updatePhysics(deltaTime);
+    const duration<float> updatePhysTime = steady_clock::now() - last;
+    TimeLogger::Update(updatePhysTime.count());
 
     // tell glut to draw - note this will cap this function at 60 fps
     glutPostRedisplay();
@@ -182,10 +183,18 @@ void mouse(int button, int state, int x, int y) {
             auto it = std::find(colliders.begin(), end, clickedBox);
             if (it != end)
             {
+                if (clickedBox->isBox)
+                    --boxCount;
+                else
+                    --sphereCount;
+
+
+
                 std::vector<ColliderObject*>& owningVector = it.linkedVec->vector;
                 size_t offset = (it.getPtr() - owningVector.data());
                 delete clickedBox;
                 owningVector.erase(owningVector.begin() + offset);
+
             }
         }
     }
@@ -219,6 +228,7 @@ void cleanup()
 #ifdef _DEBUG
     MemoryManager::Cleanup();
 #endif
+    // error in locale0 due to external library cleanup code
     MemoryPoolManager::Cleanup();
 }
 
@@ -352,8 +362,10 @@ void initOpenGl()
 
 void initScene(int boxCount, int sphereCount)
 {
-    sphereColliders = new ColliderObjs(sphereCount);
-    boxColliders = new ColliderObjs(sphereColliders, boxCount);
+    sphereColliders = new ColliderObjs(0U);
+    boxColliders = new ColliderObjs(sphereColliders, 0U);
+    boxColliders->vector.resize(boxCount);
+    sphereColliders->vector.resize(sphereCount);
 
     octree = new Octree(
         Vec3((maxX - minX) / 2.0f, (maxY - minY) / 2.0f, (maxZ - minZ) / 2.0f),

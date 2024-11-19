@@ -1,0 +1,38 @@
+Initialisation took (in milliseconds): 4.8897
+Octree Depth: 2. Thread count: 4
+
+Counts - Cube: 5000, Sphere:5000, Total: 10000
+Average time (in seconds) taken to update physics over last 50 frames: 0.0825597
+
+Counts - Cube: 5000, Sphere:5000, Total: 10000
+Average time (in seconds) taken to update physics over last 50 frames: 0.0279544
+
+Counts - Cube: 5000, Sphere:5000, Total: 10000
+Average time (in seconds) taken to update physics over last 50 frames: 0.0257888
+
+Counts - Cube: 5000, Sphere:5000, Total: 10000
+Average time (in seconds) taken to update physics over last 50 frames: 0.0263813
+
+Counts - Cube: 5000, Sphere:5000, Total: 10000
+Average time (in seconds) taken to update physics over last 50 frames: 0.0261898
+
+Counts - Cube: 5000, Sphere:5000, Total: 10000
+Average time (in seconds) taken to update physics over last 50 frames: 0.0254482
+
+Counts - Cube: 5000, Sphere:5000, Total: 10000
+Average time (in seconds) taken to update physics over last 50 frames: 0.0265059
+
+Counts - Cube: 5000, Sphere:5000, Total: 10000
+Average time (in seconds) taken to update physics over last 50 frames: 0.0262796
+
+Counts - Cube: 5000, Sphere:5000, Total: 10000
+Average time (in seconds) taken to update physics over last 50 frames: 0.0266226
+
+Counts - Cube: 5000, Sphere:5000, Total: 10000
+Average time (in seconds) taken to update physics over last 50 frames: 0.0262815
+
+Counts - Cube: 5000, Sphere:5000, Total: 10000
+Average time (in seconds) taken to update physics over last 50 frames: 0.0262728
+
+Counts - Cube: 5000, Sphere:5000, Total: 10000
+Average time (in seconds) taken to update physics over last 50 frames: 0.0290337

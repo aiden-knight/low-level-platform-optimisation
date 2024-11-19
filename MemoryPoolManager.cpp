@@ -34,9 +34,6 @@ namespace MemoryPoolManager
 #endif // _DEBUG
 
 		std::array<StaticMemoryPool*, staticPoolCount> staticPools;
-
-		void* start = nullptr;
-		void* end = nullptr;
 	}
 
 	char InitMemoryPools()
@@ -88,19 +85,15 @@ namespace MemoryPoolManager
 		}
 		
 		// otherwise try and place it in dynamic pool
+		// assuming size isn't reasonably large
 		if (size > (chunkSize * 4)) return nullptr;
 		return poolPtr->Allocate(size);
 	}
 
 	bool FreeMemory(void* ptr)
 	{
-		// if pools already destroyed (aka after main)
-		if (poolPtr == nullptr)
-		{
-			// returns whether it would have already been freed
-			return ptr >= start && ptr <= end;
-		}
-		
+		if (!poolPtr) return true;
+
 		for (size_t i = 0; i < staticPoolCount; ++i)
 		{
 			if (staticPools[i]->Free(ptr))
@@ -125,9 +118,6 @@ namespace MemoryPoolManager
 	{
 		if (poolPtr != nullptr)
 		{
-			start = poolPtr->start;
-			end = poolPtr->end;
-
 			poolPtr->~MemoryPool();
 			for (size_t i = 0; i < staticPoolCount; ++i)
 			{

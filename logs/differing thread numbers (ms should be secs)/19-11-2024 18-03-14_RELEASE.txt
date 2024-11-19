@@ -1,0 +1,50 @@
+Initialisation took (in milliseconds): 1.9146
+Octree Depth: 4. Thread count: 2
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00447951
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00392526
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00378751
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00383722
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00387517
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00372835
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00384222
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00376625
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00374629
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00377529
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00377493
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00378287
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00384198
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00391373
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00396179
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00381469

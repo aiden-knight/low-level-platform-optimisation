@@ -16,6 +16,7 @@ public:
     Vec3 colour;
 
     ColliderObject* pNext = nullptr;
+    bool isBox = false;
 
     // if two colliders collide, push them away from each other
     static void resolveCollision(ColliderObject* a, ColliderObject* b) {

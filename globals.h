@@ -16,7 +16,7 @@ extern unsigned int octreeDepth;
 constexpr unsigned int maxOctantDepth = 10;
 
 constexpr size_t chunkSize = 100;
-constexpr size_t chunkCount = 100;
+constexpr size_t chunkCount = 10;
 
 
 // these is where the camera is, where it is looking and the bounds of the continaing box. You shouldn't need to alter these

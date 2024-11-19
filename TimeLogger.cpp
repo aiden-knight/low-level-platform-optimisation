@@ -68,10 +68,9 @@ namespace TimeLogger
                 sum += deltaTimeArray[i];
             }
             sum /= deltaTimeArray.size();
-            sum = 1 / sum;
 
             *outStream << "\nCounts - Cube: " << boxCount << ", Sphere:" << sphereCount << ", Total: " << boxCount + sphereCount << std::endl;
-            *outStream << "Average fps over last " << deltaTimeArray.size() << " frames: " << sum << std::endl;
+            *outStream << "Average time (in seconds) taken to update physics over last " << deltaTimeArray.size() << " frames: " << sum << std::endl;
         }
 	}
 }

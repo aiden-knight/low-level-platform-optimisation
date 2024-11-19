@@ -1,0 +1,47 @@
+Initialisation took (in milliseconds): 4.2302
+Octree Depth: 3. Thread count: 4
+
+Counts - Cube: 5000, Sphere:5000, Total: 10000
+Average time (in seconds) taken to update physics over last 50 frames: 0.0401639
+
+Counts - Cube: 5000, Sphere:5000, Total: 10000
+Average time (in seconds) taken to update physics over last 50 frames: 0.0214244
+
+Counts - Cube: 5000, Sphere:5000, Total: 10000
+Average time (in seconds) taken to update physics over last 50 frames: 0.0219367
+
+Counts - Cube: 5000, Sphere:5000, Total: 10000
+Average time (in seconds) taken to update physics over last 50 frames: 0.021821
+
+Counts - Cube: 5000, Sphere:5000, Total: 10000
+Average time (in seconds) taken to update physics over last 50 frames: 0.0213503
+
+Counts - Cube: 5000, Sphere:5000, Total: 10000
+Average time (in seconds) taken to update physics over last 50 frames: 0.020913
+
+Counts - Cube: 5000, Sphere:5000, Total: 10000
+Average time (in seconds) taken to update physics over last 50 frames: 0.02045
+
+Counts - Cube: 5000, Sphere:5000, Total: 10000
+Average time (in seconds) taken to update physics over last 50 frames: 0.0201623
+
+Counts - Cube: 5000, Sphere:5000, Total: 10000
+Average time (in seconds) taken to update physics over last 50 frames: 0.0197403
+
+Counts - Cube: 5000, Sphere:5000, Total: 10000
+Average time (in seconds) taken to update physics over last 50 frames: 0.0195713
+
+Counts - Cube: 5000, Sphere:5000, Total: 10000
+Average time (in seconds) taken to update physics over last 50 frames: 0.0205619
+
+Counts - Cube: 5000, Sphere:5000, Total: 10000
+Average time (in seconds) taken to update physics over last 50 frames: 0.0229935
+
+Counts - Cube: 5000, Sphere:5000, Total: 10000
+Average time (in seconds) taken to update physics over last 50 frames: 0.0230954
+
+Counts - Cube: 5000, Sphere:5000, Total: 10000
+Average time (in seconds) taken to update physics over last 50 frames: 0.0244246
+
+Counts - Cube: 5000, Sphere:5000, Total: 10000
+Average time (in seconds) taken to update physics over last 50 frames: 0.0250969

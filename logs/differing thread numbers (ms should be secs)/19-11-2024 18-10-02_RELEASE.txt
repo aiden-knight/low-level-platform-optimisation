@@ -1,0 +1,50 @@
+Initialisation took (in milliseconds): 10.4394
+Octree Depth: 4. Thread count: 16
+
+Counts - Cube: 50, Sphere:50, Total: 100
+Average time (in ms) taken to update physics over last 50 frames: 0.00942864
+
+Counts - Cube: 50, Sphere:50, Total: 100
+Average time (in ms) taken to update physics over last 50 frames: 0.00934665
+
+Counts - Cube: 50, Sphere:50, Total: 100
+Average time (in ms) taken to update physics over last 50 frames: 0.00941948
+
+Counts - Cube: 50, Sphere:50, Total: 100
+Average time (in ms) taken to update physics over last 50 frames: 0.00937564
+
+Counts - Cube: 50, Sphere:50, Total: 100
+Average time (in ms) taken to update physics over last 50 frames: 0.00920137
+
+Counts - Cube: 50, Sphere:50, Total: 100
+Average time (in ms) taken to update physics over last 50 frames: 0.00919075
+
+Counts - Cube: 50, Sphere:50, Total: 100
+Average time (in ms) taken to update physics over last 50 frames: 0.00927804
+
+Counts - Cube: 50, Sphere:50, Total: 100
+Average time (in ms) taken to update physics over last 50 frames: 0.00921888
+
+Counts - Cube: 50, Sphere:50, Total: 100
+Average time (in ms) taken to update physics over last 50 frames: 0.00938395
+
+Counts - Cube: 50, Sphere:50, Total: 100
+Average time (in ms) taken to update physics over last 50 frames: 0.00920453
+
+Counts - Cube: 50, Sphere:50, Total: 100
+Average time (in ms) taken to update physics over last 50 frames: 0.00905635
+
+Counts - Cube: 50, Sphere:50, Total: 100
+Average time (in ms) taken to update physics over last 50 frames: 0.00924154
+
+Counts - Cube: 50, Sphere:50, Total: 100
+Average time (in ms) taken to update physics over last 50 frames: 0.00937762
+
+Counts - Cube: 50, Sphere:50, Total: 100
+Average time (in ms) taken to update physics over last 50 frames: 0.0094291
+
+Counts - Cube: 50, Sphere:50, Total: 100
+Average time (in ms) taken to update physics over last 50 frames: 0.00939434
+
+Counts - Cube: 50, Sphere:50, Total: 100
+Average time (in ms) taken to update physics over last 50 frames: 0.00949701

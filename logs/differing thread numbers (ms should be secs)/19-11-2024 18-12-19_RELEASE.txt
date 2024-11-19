@@ -1,0 +1,98 @@
+Initialisation took (in milliseconds): 19.5346
+Octree Depth: 4. Thread count: 32
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00568879
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00594704
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00688571
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.0078288
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00830215
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00838047
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00804403
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00831317
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00836835
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00805112
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00916616
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00850176
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00855669
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00829159
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00813883
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00842787
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00795318
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00821583
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00824103
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00863013
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00876957
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00844333
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00813025
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00853488
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00896196
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00845208
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00863364
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00829155
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00816998
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.0081605
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00810635
+
+Counts - Cube: 500, Sphere:500, Total: 1000
+Average time (in ms) taken to update physics over last 50 frames: 0.00773637

@@ -4,6 +4,10 @@
 class Box : public ColliderObject
 {
 public:
+	Box() : ColliderObject()
+	{
+		isBox = true;
+	}
 #ifdef _DEBUG
 	void* operator new (size_t size);
 #endif
