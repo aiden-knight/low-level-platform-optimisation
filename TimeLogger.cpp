@@ -1,4 +1,5 @@
 #include "TimeLogger.h"
+#include "globals.h"
 #include <array>
 #include <ctime>
 #include <fstream>
@@ -50,6 +51,7 @@ namespace TimeLogger
     {
         if (outStream == nullptr) return;
         *outStream << "Initialisation took (in milliseconds): " << initTime << std::endl;
+        *outStream << "Octree Depth: " << octreeDepth << ". Thread count: " << threadCount << std::endl;
     }
 
     void Update(const float deltaTime)
@@ -68,6 +70,7 @@ namespace TimeLogger
             sum /= deltaTimeArray.size();
             sum = 1 / sum;
 
+            *outStream << "\nCounts - Cube: " << boxCount << ", Sphere:" << sphereCount << ", Total: " << boxCount + sphereCount << std::endl;
             *outStream << "Average fps over last " << deltaTimeArray.size() << " frames: " << sum << std::endl;
         }
 	}

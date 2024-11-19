@@ -295,6 +295,7 @@ void keyboard(unsigned char key, int x, int y) {
         boxes.pop_back();
         std::cout << "Removed Box" << std::endl;
     }
+    if (boxCount != 0) --boxCount;
         break;
     case 'a':
     {
@@ -302,6 +303,7 @@ void keyboard(unsigned char key, int x, int y) {
         boxColliders->vector.emplace_back(box);
         std::cout << "Added Box" << std::endl;
     }
+    ++boxCount;
         break;
     case 'R':
     {
@@ -310,6 +312,7 @@ void keyboard(unsigned char key, int x, int y) {
         spheres.pop_back();
         std::cout << "Removed Sphere" << std::endl;
     }
+    if (sphereCount != 0) --sphereCount;
         break;
     case 'A':
     {
@@ -317,6 +320,7 @@ void keyboard(unsigned char key, int x, int y) {
         sphereColliders->vector.emplace_back(sphere);
         std::cout << "Added Sphere" << std::endl;
     }
+    ++sphereCount;
         break;
     }
 }
